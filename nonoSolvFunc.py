@@ -112,7 +112,7 @@ def extractNumbers():
             best_score = -1
 
             for digit in range(1, 5):
-                template = cv2.imread(f"{digit}.png", 0)
+                template = cv2.imread(f"templates\\{digit}.png", 0)
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
                 template = cv2.resize(template, (50, 50))

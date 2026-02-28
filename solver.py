@@ -2,16 +2,12 @@ import nonoSolvFunc
 import cv2
 import os
 
-# Coordinates to make the image from the screen
+# Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()
+
+# Get the columns part from here
 column_coords = nonoSolvFunc.getColumnImage(puzzle_coords)
 
-# Import digit templates from 1 to 9 (0 can't exist in a Nonogram, so we don't need a template for it)
-digit_templates = {}
-for file in os.listdir("./templates"):
-    if file.endswith(".png") and file[0].isdigit():
-        digit = file.split(".")[0]
-        digit_templates[digit] = cv2.imread(file, 0)
-
+# Read the digits from the columns
 column_digits = nonoSolvFunc.extractNumbers()
 print(column_digits)
