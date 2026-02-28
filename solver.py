@@ -1,6 +1,4 @@
 import nonoSolvFunc
-import cv2
-import os
 
 # Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()

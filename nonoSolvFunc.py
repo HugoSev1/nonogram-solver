@@ -124,9 +124,8 @@ def extractNumbers():
                     best_match = digit
 
             if (best_score > 0.7):
-                digits.append((best_match, x))
+                digits.append((best_match, y))
         digits.sort(key=lambda x: x[1])
         result = [d[0] for d in digits]
-        result.reverse()
         extractingArray.append(result)
     return extractingArray
