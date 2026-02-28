@@ -10,5 +10,12 @@ column_digits = nonoSolvFunc.extractColumnNumbers()
 # Read the digits from the columns
 row_coords = nonoSolvFunc.getRowImage(puzzle_coords)
 row_digits = nonoSolvFunc.extractRowNumbers()
-print(column_digits)
-print(row_digits)
+
+# Make a two-dimensional array to store the game board
+game_board = []
+for id_i, i in enumerate(column_digits):
+    game_board.append([])
+    for j in row_digits:
+        game_board[id_i].append(0)
+        
+print(game_board)
