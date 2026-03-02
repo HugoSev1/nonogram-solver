@@ -217,3 +217,33 @@ def extractRowNumbers():
         result = [d[0] for d in digits]
         extractingArray.append(result)
     return extractingArray
+
+
+# The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, and "F" to a tile that has to be unchecked)
+
+# Function that puts an array into a column in the game board
+def fillColumn(array, board, columnIndex):
+    for i in range(len(board)):
+        if array != None:
+            board[i][columnIndex] = array[i]
+
+
+# Function that puts an array into a row in the game board
+def fillRow(array, board, rowIndex):
+    for i in range(len(board)):
+        if array != None:
+            board[rowIndex][i] = array[i]
+
+
+# Function that solves lines that only have one possibility
+def doFullLine(width_size, current_numbers, current_line):
+    current_line = []
+
+    # Check that the sum of all affected tiles is equal to the total amount of tiles on the current line
+    if sum(current_numbers) + len(current_numbers) - 1 == width_size:
+        for id_i, i in enumerate(current_numbers):
+            for i in range(i):
+                current_line.append("T")
+            if id_i + 1 != len(current_numbers):
+                current_line.append("F")
+        return current_line
