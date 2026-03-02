@@ -89,11 +89,25 @@ for i in range(row_amount):
     current_line = nonoSolvFunc.doFullLine(row_amount, row_digits[i], [])
     nonoSolvFunc.fillRow(current_line, game_board, i)
 
+# Limit the working area
+line_index = 3
+number_index = 0
+
+test_working_area = (nonoSolvFunc.limitLineArea(
+    column_digits[line_index], number_index, row_amount))
+nonoSolvFunc.limitColumnArea(game_board, test_working_area, line_index)
+
 # Draw the tiles
 for i in range(row_amount):
     for j in range(row_amount):
         if game_board[j][i] == "T":
             pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
+                grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
+        elif game_board[j][i] == "F":
+            pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(
+                grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
+        elif game_board[j][i] == "W":
+            pygame.draw.rect(screen, (0, 192, 255), pygame.Rect(
                 grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
             grid_shift + (tile_width*row_width) + i*tile_width, grid_shift + (tile_width*columns_height) + j*tile_width, tile_width, tile_width), 3)

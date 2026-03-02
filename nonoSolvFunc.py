@@ -247,3 +247,46 @@ def doFullLine(width_size, current_numbers, current_line):
             if id_i + 1 != len(current_numbers):
                 current_line.append("F")
         return current_line
+
+
+# Function that limits the working area for each number
+def limitLineArea(line, number_index, row_amount):
+    area_array = []
+    before_area = 0
+    after_area = 0
+    # When the number is the first number in the column / row
+    if number_index == 0:
+        for i in range(len(line[1:])):
+            after_area += 1
+            after_area += line[1:][i]
+    # When the number is the last number in the column / row
+    elif number_index == len(line) - 1:
+        for i in range(len(line[1:])):
+            before_area += 1
+            before_area += line[i]
+    # When the number is in the middle (I will work on this when doing the 10x10 part)
+    else:
+        print((str(line[number_index])))
+
+    # Put the values in the array
+    for i in range(before_area):
+        area_array.append(0)
+    for i in range(row_amount - (before_area + after_area)):
+        area_array.append("W")
+    for i in range(after_area):
+        area_array.append(0)
+    return area_array
+
+
+# Function that puts a limited area into a column of the board
+def limitColumnArea(board, working_area, line_index):
+    for i in range(len(working_area)):
+        if board[i][line_index] == 0:
+            board[i][line_index] = working_area[i]
+
+
+# Function that puts a limited area into a row of the board
+def limitRowArea(board, working_area, line_index):
+    for i in range(len(working_area)):
+        if board[line_index][i] == 0:
+            board[line_index][i] = working_area[i]
