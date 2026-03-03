@@ -225,14 +225,16 @@ def extractRowNumbers():
 def fillColumn(array, board, columnIndex):
     for i in range(len(board)):
         if array != None:
-            board[i][columnIndex] = array[i]
+            if array[i] == 'T' or array[i] == 'F':
+                board[i][columnIndex] = array[i]
 
 
 # Function that puts an array into a row in the game board
 def fillRow(array, board, rowIndex):
     for i in range(len(board)):
         if array != None:
-            board[rowIndex][i] = array[i]
+            if array[i] == 'T' or array[i] == 'F':
+                board[rowIndex][i] = array[i]
 
 
 # Function that solves lines that only have one possibility
@@ -270,11 +272,11 @@ def limitLineArea(line, number_index, row_amount):
 
     # Put the values in the array
     for i in range(before_area):
-        area_array.append(0)
+        area_array.append('X')
     for i in range(row_amount - (before_area + after_area)):
-        area_array.append("W")
-    for i in range(after_area):
         area_array.append(0)
+    for i in range(after_area):
+        area_array.append('X')
     return area_array
 
 
@@ -290,3 +292,34 @@ def limitRowArea(board, working_area, line_index):
     for i in range(len(working_area)):
         if board[line_index][i] == 0:
             board[line_index][i] = working_area[i]
+
+
+# Function that returns an array with the confirmed extremums
+def doExtremumConfirm(working_array, number):
+    current_working_array = []
+    full_array = []
+    final_array = []
+    # Makes a smaller array to work with
+    for i in working_array:
+        if i == 0:
+            current_working_array.append(i)
+
+    # Checks confirmed tiles
+    for i in range(-number, number):
+        current_working_array[i] += 1
+    append_offset = 0
+
+    # Makes the full array with the updated numbers
+    for i in working_array:
+        if i == 0:
+            full_array.append(current_working_array[append_offset])
+            append_offset += 1
+        else:
+            full_array.append(0)
+    # Makes the final array
+    for i in full_array:
+        if i == 2:
+            final_array.append('T')
+        else:
+            final_array.append(0)
+    return final_array

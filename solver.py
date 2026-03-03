@@ -19,6 +19,12 @@ for id_i, i in enumerate(column_digits):
     for j in row_digits:
         game_board[id_i].append(0)
 
+# Make a similar array to store the working area
+working_area_board = []
+for id_i, i in enumerate(column_digits):
+    working_area_board.append([])
+    for j in row_digits:
+        working_area_board[id_i].append(0)
 
 # For the pygame display
 columns_height = max(map(len, column_digits))
@@ -39,13 +45,8 @@ font = pygame.font.SysFont("Arial", int(tile_width))
 
 # Display the board in a pygame window (for testing)
 pygame.init
-test_board = []
 screen = pygame.display.set_mode((640, 640))
 screen.fill((42, 43, 35))
-for i in range(row_amount):
-    test_board.append([])
-    for j in range(row_amount):
-        test_board[i].append(0)
 
 # Display the column numbers
 for i in range(len(column_digits)):
@@ -89,13 +90,32 @@ for i in range(row_amount):
     current_line = nonoSolvFunc.doFullLine(row_amount, row_digits[i], [])
     nonoSolvFunc.fillRow(current_line, game_board, i)
 
-# Limit the working area
-line_index = 3
-number_index = 0
+# Do the remaining confirmed tiles (by the extremums)
+for i in range(row_amount):
+    line_index = i
+    # Do columns
+    for id_j, j in enumerate(column_digits[i]):
+        number_index = id_j
+        current_working_area = (nonoSolvFunc.limitLineArea(
+            column_digits[line_index], number_index, row_amount))
+        print(current_working_area)
+        nonoSolvFunc.limitColumnArea(
+            working_area_board, current_working_area, line_index)
 
-test_working_area = (nonoSolvFunc.limitLineArea(
-    column_digits[line_index], number_index, row_amount))
-nonoSolvFunc.limitColumnArea(game_board, test_working_area, line_index)
+        extremum_array = nonoSolvFunc.doExtremumConfirm(
+            current_working_area, column_digits[line_index][number_index])
+        nonoSolvFunc.fillColumn(extremum_array, game_board, line_index)
+    # Do rows
+    for id_j, j in enumerate(row_digits[i]):
+        number_index = id_j
+        current_working_area = (nonoSolvFunc.limitLineArea(
+            row_digits[line_index], number_index, row_amount))
+        nonoSolvFunc.limitRowArea(
+            working_area_board, current_working_area, line_index)
+
+        extremum_array = nonoSolvFunc.doExtremumConfirm(
+            current_working_area, row_digits[line_index][number_index])
+        nonoSolvFunc.fillRow(extremum_array, game_board, line_index)
 
 # Draw the tiles
 for i in range(row_amount):
