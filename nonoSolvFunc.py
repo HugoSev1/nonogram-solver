@@ -221,10 +221,27 @@ def extractRowNumbers():
 
 # The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, and "F" to a tile that has to be unchecked)
 
+# Function that extracts a column from the board
+def extractColFromBoard(board, index):
+    # Create an empty array
+    line_array = []
+
+    # Put the values in the array
+    for i in range(len(board)):
+        line_array.append(board[i][index])
+
+    # Return the array
+    return line_array
+
+
+# Function that extracts a row from the board
+def extractRowFromBoard(board, index):
+    return board[index]
+
 # Function that puts an array into a column in the game board
 def fillColumn(array, board, columnIndex):
     for i in range(len(board)):
-        if array != None:
+        if array != None and len(array) != 0:
             if array[i] == 'T' or array[i] == 'F':
                 board[i][columnIndex] = array[i]
 
@@ -232,7 +249,7 @@ def fillColumn(array, board, columnIndex):
 # Function that puts an array into a row in the game board
 def fillRow(array, board, rowIndex):
     for i in range(len(board)):
-        if array != None:
+        if array != None and len(array) != 0:
             if array[i] == 'T' or array[i] == 'F':
                 board[rowIndex][i] = array[i]
 
@@ -323,3 +340,25 @@ def doExtremumConfirm(working_array, number):
         else:
             final_array.append(0)
     return final_array
+
+
+# Function that completes with F's when the full black squares are found
+def doCompleteLine(current_line, current_board_line):
+    # Complete array that will be returned
+    complete_array = []
+    
+    # Sum of the digits of the line
+    line_sum = sum(current_line)
+    
+    # Sum of the black tiles that are currently checked on the board
+    on_board_sum = current_board_line.count('T')
+    
+    # If the line is completed, fill the remaining squares with F's
+    if line_sum == on_board_sum:
+        for i in range(len(current_board_line)):
+            if current_board_line[i] == 'T':
+                complete_array.append('T')
+            else:
+                complete_array.append('F')
+    
+    return complete_array

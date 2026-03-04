@@ -98,13 +98,13 @@ for i in range(row_amount):
         number_index = id_j
         current_working_area = (nonoSolvFunc.limitLineArea(
             column_digits[line_index], number_index, row_amount))
-        print(current_working_area)
         nonoSolvFunc.limitColumnArea(
             working_area_board, current_working_area, line_index)
 
         extremum_array = nonoSolvFunc.doExtremumConfirm(
             current_working_area, column_digits[line_index][number_index])
         nonoSolvFunc.fillColumn(extremum_array, game_board, line_index)
+
     # Do rows
     for id_j, j in enumerate(row_digits[i]):
         number_index = id_j
@@ -117,6 +117,21 @@ for i in range(row_amount):
             current_working_area, row_digits[line_index][number_index])
         nonoSolvFunc.fillRow(extremum_array, game_board, line_index)
 
+# Complete lines with F's when all black squares on the line are found:
+for i in range(row_amount):
+    # Do columns
+    current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+    current_complete_array = nonoSolvFunc.doCompleteLine(
+        column_digits[i], current_line)
+    nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+    # Do rows
+    current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+    current_complete_array = nonoSolvFunc.doCompleteLine(
+        row_digits[i], current_line)
+    nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+
 # Draw the tiles
 for i in range(row_amount):
     for j in range(row_amount):
@@ -125,9 +140,6 @@ for i in range(row_amount):
                 grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
         elif game_board[j][i] == "F":
             pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(
-                grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
-        elif game_board[j][i] == "W":
-            pygame.draw.rect(screen, (0, 192, 255), pygame.Rect(
                 grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
             grid_shift + (tile_width*row_width) + i*tile_width, grid_shift + (tile_width*columns_height) + j*tile_width, tile_width, tile_width), 3)
