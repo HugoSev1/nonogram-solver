@@ -132,6 +132,20 @@ for i in range(row_amount):
     nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 
+# Complete lines with T's if it's the only possibility with the current board configuration
+for i in range(row_amount):
+    # Do columns
+    current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+    current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
+        column_digits[i], current_line)
+    nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+    # Do rows
+    current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+    current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
+        row_digits[i], current_line)
+    nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
 # Draw the tiles
 for i in range(row_amount):
     for j in range(row_amount):

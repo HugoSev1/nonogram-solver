@@ -239,6 +239,8 @@ def extractRowFromBoard(board, index):
     return board[index]
 
 # Function that puts an array into a column in the game board
+
+
 def fillColumn(array, board, columnIndex):
     for i in range(len(board)):
         if array != None and len(array) != 0:
@@ -346,13 +348,13 @@ def doExtremumConfirm(working_array, number):
 def doCompleteLine(current_line, current_board_line):
     # Complete array that will be returned
     complete_array = []
-    
+
     # Sum of the digits of the line
     line_sum = sum(current_line)
-    
+
     # Sum of the black tiles that are currently checked on the board
     on_board_sum = current_board_line.count('T')
-    
+
     # If the line is completed, fill the remaining squares with F's
     if line_sum == on_board_sum:
         for i in range(len(current_board_line)):
@@ -360,5 +362,29 @@ def doCompleteLine(current_line, current_board_line):
                 complete_array.append('T')
             else:
                 complete_array.append('F')
-    
+
     return complete_array
+
+
+# Function that fills black squares when the only tiles left should be black squares
+def doCompleteBlackSquares(current_line, current_board_line):
+    # Complete array that will be returned
+    complete_array = []
+    
+    # Highest possibility of black squares with current board configuration
+    max_possible_black = 0
+
+    # Adds 1 whenever a black square is / can be placed
+    for i in current_board_line:
+        if i == 0 or i == 'T':
+            max_possible_black += 1
+
+    # If the amount of possible black squares matches the sum of the numbers in the current line, then all of the remaining squares will be marked as 'T'
+    if sum(current_line) == max_possible_black:
+        for i in current_board_line:
+            if i == 0:
+                complete_array.append('T')
+            else:
+                complete_array.append(i)
+                
+        return complete_array
