@@ -19,6 +19,13 @@ for id_i, i in enumerate(column_digits):
     for j in row_digits:
         game_board[id_i].append(0)
 
+# Copy the board (Will be useful later)
+previous_board = []
+for id_i, i in enumerate(column_digits):
+    previous_board.append([])
+    for j in row_digits:
+        previous_board[id_i].append(0)
+
 # Make a similar array to store the working area
 working_area_board = []
 for id_i, i in enumerate(column_digits):
@@ -83,6 +90,7 @@ for i in range(len(row_digits)):
 pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
     grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
 
+# FIRST PART: only has to be done once
 # Do the lines that have only one possibility
 for i in range(row_amount):
     current_line = nonoSolvFunc.doFullLine(row_amount, column_digits[i], [])
@@ -117,58 +125,65 @@ for i in range(row_amount):
             current_working_area, row_digits[line_index][number_index])
         nonoSolvFunc.fillRow(extremum_array, game_board, line_index)
 
-# Complete lines with F's when all black squares on the line are found:
-for i in range(row_amount):
-    # Do columns
-    current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-    current_complete_array = nonoSolvFunc.doCompleteLine(
-        column_digits[i], current_line)
-    nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+# SECOND PART: Repeats until it does nothing
+while previous_board != game_board:
+    for id_i, i in enumerate(game_board):
+        previous_board[id_i] = i.copy()
+    # Complete lines with F's when all black squares on the line are found:
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.doCompleteLine(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
 
-    # Do rows
-    current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-    current_complete_array = nonoSolvFunc.doCompleteLine(
-        row_digits[i], current_line)
-    nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.doCompleteLine(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 
-# Complete lines with T's if it's the only possibility with the current board configuration
-for i in range(row_amount):
-    # Do columns
-    current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-    current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
-        column_digits[i], current_line)
-    nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+    # Complete lines with T's if it's the only possibility with the current board configuration
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
 
-    # Do rows
-    current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-    current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
-        row_digits[i], current_line)
-    nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
-# Complete what's possible when a line has only one number and F's (e.g. 3 on a row that is 00TF0 becomes 00TFF)
-for i in range(row_amount):
-    # Do columns
-    current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-    current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-        column_digits[i], current_line)
-    current_complete_array.reverse()
-    current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-        column_digits[i], current_complete_array)
-    current_complete_array.reverse()
-    nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-    
-    # Do rows
-    current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-    current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-        row_digits[i], current_line)
-    current_complete_array.reverse()
-    current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-        row_digits[i], current_complete_array)
-    current_complete_array.reverse()
-    nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+    # Complete what's possible when a line has only one number and F's (e.g. 3 on a row that is 00TF0 becomes 00TFF)
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+            column_digits[i], current_line)
+        current_complete_array.reverse()
+        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+            column_digits[i], current_complete_array)
+        current_complete_array.reverse()
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
 
-# Draw the tiles
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+            row_digits[i], current_line)
+        current_complete_array.reverse()
+        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+            row_digits[i], current_complete_array)
+        current_complete_array.reverse()
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+
+# ------------------------
+# Draw the tiles in Pygame
+# ------------------------
 for i in range(row_amount):
     for j in range(row_amount):
         if game_board[j][i] == "T":
