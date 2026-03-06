@@ -287,7 +287,7 @@ def limitLineArea(line, number_index, row_amount):
             before_area += line[i]
     # When the number is in the middle (I will work on this when doing the 10x10 part)
     else:
-        print((str(line[number_index])))
+        pass
 
     # Put the values in the array
     for i in range(before_area):
@@ -370,7 +370,7 @@ def doCompleteLine(current_line, current_board_line):
 def doCompleteBlackSquares(current_line, current_board_line):
     # Complete array that will be returned
     complete_array = []
-    
+
     # Highest possibility of black squares with current board configuration
     max_possible_black = 0
 
@@ -386,5 +386,28 @@ def doCompleteBlackSquares(current_line, current_board_line):
                 complete_array.append('T')
             else:
                 complete_array.append(i)
-                
+
         return complete_array
+
+
+# Function that completes what's possible when a line has only one number and F's (e.g. 3 on a row that is 00TF0 becomes TTTF0)
+def reduceSingularNumbers(current_line, current_board_line):
+    working_array = []
+    is_black_square_met = False
+    is_crossed_square_met = False
+    if len(current_line) == 1:
+        for i in current_board_line:
+            if i == 'T':
+                is_black_square_met = True
+                working_array.append(i)
+            elif i == 'F':
+                working_array.append(i)
+                if is_black_square_met:
+                    is_crossed_square_met = True
+            elif i == 0:
+                if is_crossed_square_met:
+                    working_array.append('F')
+                else:
+                    working_array.append(0)
+
+    return working_array
