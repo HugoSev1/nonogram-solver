@@ -186,10 +186,24 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.tileCannotFit(
             column_digits[i], current_line)
         nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-        
+
         # Do rows
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.tileCannotFit(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+    # Check extremums that are done
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.extremumCompletion(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.extremumCompletion(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 

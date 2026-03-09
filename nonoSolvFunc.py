@@ -441,3 +441,16 @@ def tileCannotFit(current_line, current_board_line):
             final_array.extend(i)
 
         return final_array
+
+
+# Function that finds when the first or last part of a line is completed
+def extremumCompletion(current_line, current_board_line):
+    # An array that contains what we want to have in order to keep the function going
+    theoretical_array = []
+    for i in range(current_line[0]):
+        theoretical_array.append('T')
+    
+    if current_board_line[0:current_line[0]] == theoretical_array:
+        current_board_line[current_line[0]] = 'F'
+        return current_board_line
+        
