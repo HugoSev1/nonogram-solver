@@ -411,3 +411,33 @@ def reduceSingularNumbers(current_line, current_board_line):
                     working_array.append(0)
 
     return working_array
+
+
+# Function that finds where a tile can't fit (e.g. a "2" can't go where inside 0 but can in 000 so it goes somewhere in the last 3 tiles of 0F000)
+def tileCannotFit(current_line, current_board_line):
+    working_array = []
+    array_part = []
+    final_array = []
+
+    if 'T' in current_board_line:
+        return current_board_line
+    else:
+        for i in current_board_line:
+            if i == 0:
+                array_part.append(i)
+            elif i == 'F':
+                working_array.append(array_part[:])
+                working_array.append(['F'])
+                array_part.clear()
+
+        working_array.append(array_part[:])
+
+        for i in working_array:
+            if min(current_line) > len(i):
+                for id_j, j in enumerate(i):
+                    i[id_j] = 'F'
+
+        for i in working_array:
+            final_array.extend(i)
+
+        return final_array

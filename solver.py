@@ -143,7 +143,6 @@ while previous_board != game_board:
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
-
     # Complete lines with T's if it's the only possibility with the current board configuration
     for i in range(row_amount):
         # Do columns
@@ -180,6 +179,19 @@ while previous_board != game_board:
         current_complete_array.reverse()
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
+    # Place tiles that can't fit elsewhere
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.tileCannotFit(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+        
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.tileCannotFit(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 # ------------------------
 # Draw the tiles in Pygame
