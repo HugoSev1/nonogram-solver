@@ -415,8 +415,13 @@ def reduceSingularNumbers(current_line, current_board_line):
 
 # Function that finds where a tile can't fit (e.g. a "2" can't go where inside 0 but can in 000 so it goes somewhere in the last 3 tiles of 0F000)
 def tileCannotFit(current_line, current_board_line):
+    # Base array
     working_array = []
+
+    # Portion of the array
     array_part = []
+
+    # Array that gets returned
     final_array = []
 
     if 'T' in current_board_line:
@@ -449,8 +454,45 @@ def extremumCompletion(current_line, current_board_line):
     theoretical_array = []
     for i in range(current_line[0]):
         theoretical_array.append('T')
-    
+
     if current_board_line[0:current_line[0]] == theoretical_array:
         current_board_line[current_line[0]] = 'F'
         return current_board_line
-        
+
+
+# Function that puts black squares on tiles that have 100% probability (i.e. a relative use of the extremum function when all the possibilites overlap)
+def fillOverlapping(current_line, current_board_line):
+    # The board that will be modified
+    working_board = current_board_line[:]
+
+    # The F's at the beginning
+    board_beginning = []
+
+    # The final board
+    final_board = []
+
+    if len(current_line) == 1 and 0 in working_board:
+        while working_board[0] == 'F':
+            working_board.pop(0)
+            board_beginning.append("F")
+
+        # Initial board (with the original T's)
+        initial_board = working_board[:]
+        working_board.clear()
+        for i in range(len(initial_board)):
+            working_board.append(0)
+
+        for i in range(-current_line[0], current_line[0]):
+            working_board[i] += 1
+
+        for id_i, i in enumerate(working_board):
+            if i >= 2 or initial_board[id_i] == 'T':
+                working_board[id_i] = 'T'
+
+            else:
+                working_board[id_i] = 0
+
+        final_board.extend(board_beginning)
+        final_board.extend(working_board)
+
+        return final_board
