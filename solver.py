@@ -221,6 +221,21 @@ while previous_board != game_board:
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
+    # Check the range when there's only one number
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.checkRange(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+        
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.checkRange(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+
 # ------------------------
 # Draw the tiles in Pygame
 # ------------------------

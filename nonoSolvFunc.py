@@ -452,11 +452,13 @@ def tileCannotFit(current_line, current_board_line):
 def extremumCompletion(current_line, current_board_line):
     # An array that contains what we want to have in order to keep the function going
     theoretical_array = []
-    for i in range(current_line[0]):
+    for i in range(current_line[-1]):
         theoretical_array.append('T')
-
+    test = current_board_line[-current_line[-1]:]
     if current_board_line[0:current_line[0]] == theoretical_array:
         current_board_line[current_line[0]] = 'F'
+    elif test == theoretical_array:
+        current_board_line[-current_line[-1]-1] = 'F'
         return current_board_line
 
 
@@ -496,3 +498,47 @@ def fillOverlapping(current_line, current_board_line):
         final_board.extend(working_board)
 
         return final_board
+
+
+# Function that checks when there can't be any black tile when there's only one number (e.g. with just a 3, 02000 becomes 020XX)
+def checkRange(current_line, current_board_line):
+    # Only proceed when there's only one number in the line
+    if len(current_line) == 1:
+        # The tile where the black tile is found
+        current_tile = 0
+
+        working_board = current_board_line[:]
+
+        # Do forward
+        for id_i, i in enumerate(working_board):
+            if i == 'T':
+                current_tile = id_i
+                break
+
+        for i in range(current_tile+1, current_tile+current_line[0]):
+            if i <= len(current_board_line) and working_board[i] == 0:
+                working_board[i] = 'X'
+
+        # Do backwards
+        for i in range(-len(working_board), -1):
+            if working_board[i] == 'T':
+                current_tile = i
+                break
+
+        for i in range(current_tile - current_line[0], current_tile):
+            if i >= -len(current_board_line) and working_board[i] == 0:
+                working_board[i] = 'X'
+
+        # Put the F's in the board and restaure the other 0's, then return it
+        for id_i, i in enumerate(working_board):
+            if i == 0:
+                working_board[id_i] = 'F'
+            elif i == 'X':
+                working_board[id_i] = 0
+            
+        return working_board
+
+
+# TODO : Function that links tiles to each other when there's only one number (e.g. with just a 3, 00T0T becomes 00TTT)
+def linkTiles(current_line, current_board_line):
+    pass
