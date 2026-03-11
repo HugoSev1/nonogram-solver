@@ -228,7 +228,7 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.checkRange(
             column_digits[i], current_line)
         nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-        
+
         # Do rows
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.checkRange(
@@ -258,3 +258,9 @@ while gameRunning:
     pygame.display.update()
 
 pygame.quit()
+
+# ---------------------------
+# Place the tiles in the game
+# ---------------------------
+board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
+# nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)

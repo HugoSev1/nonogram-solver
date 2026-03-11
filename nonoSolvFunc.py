@@ -9,9 +9,8 @@ def showImg(img):
     cv2.imshow("Image", img)
     cv2.waitKey()
 
+
 # Function that returns the coordinates of the area to work with inside of the blue box
-
-
 def getPuzzleCoords():
     puzzle_coords = []
     # Getting the top left coordinates
@@ -40,8 +39,6 @@ def getPuzzleCoords():
             puzzle_coords.append(y)
             break
 
-    x2 = puzzle_coords[2]
-    y2 = puzzle_coords[3]
     return (puzzle_coords)
 
 
@@ -219,7 +216,43 @@ def extractRowNumbers():
     return extractingArray
 
 
+# Function that gets the board's coordinates from the browser in order to place the tiles directly
+def getBoardCoords(x1, y1):
+    board_coords = [x1, y1]
+    color = (42, 43, 35)
+    scrsh = pyautogui.screenshot()
+
+    # Append the X at the right of the board
+    for x in range(x1, x1 + 1000):
+        if scrsh.getpixel((x, y1)) == color:
+            board_coords.append(x)
+            break
+
+    # Append the Y at the bottom of the board
+    for y in range(y1, y1 + 1000):
+        if scrsh.getpixel((x1, y)) == color:
+            board_coords.append(y)
+            break
+
+    return board_coords
+
+
+# Function that places tiles in the browser
+def placeTiles(row_amount, board_coords, game_board):
+    length = board_coords[2] - board_coords[0]
+    tile_length = int(length / row_amount)
+
+    for id_i, i in enumerate(game_board):
+        for id_j, j in enumerate(i):
+            if j == 'T':
+                pyautogui.leftClick(board_coords[0] + ((id_j + 1) * tile_length) - (
+                    tile_length / 2), board_coords[1] + ((id_i + 1) * tile_length) - (tile_length / 2))
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------
 # The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, and "F" to a tile that has to be unchecked)
+# -------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 # Function that extracts a column from the board
 def extractColFromBoard(board, index):
