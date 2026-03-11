@@ -253,7 +253,6 @@ def placeTiles(row_amount, board_coords, game_board):
 # The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, and "F" to a tile that has to be unchecked)
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 # Function that extracts a column from the board
 def extractColFromBoard(board, index):
     # Create an empty array
@@ -571,6 +570,46 @@ def checkRange(current_line, current_board_line):
 
         return working_board
 
+
+# Function that completes lines in a limited area
+def completeLimitedLine(current_line, current_board_line, row_amount):
+    working_board = []
+    final_array = []
+    default_board = current_board_line[:]
+    
+    # Repeat the function for every number in the line
+    for id_n, n in enumerate(current_line):
+        current_number = n
+        final_array.clear()
+        working_board.clear()
+
+        # Not using the current board disposition (e.g. XX000 instead of XXFT0)
+        current_working_area = limitLineArea(current_line, id_n, row_amount)
+
+        # Puts the limited current area in the limited working area
+        for id_i, i in enumerate(current_working_area):
+            if i == 0:
+                working_board.append(default_board[id_i])
+                
+        # Check tiles when they are the only possible ones
+        if current_number == working_board.count('T') + working_board.count(0):
+            for id_i, i in enumerate(working_board):
+                if i == 0:
+                    working_board[id_i] = 'T'
+                    
+        # Put everything back in a final array:
+        for i in range(row_amount):
+            if current_working_area[i] == 'X':
+                final_array.append(default_board[i])
+                working_board.insert(0, 'X')
+            elif current_working_area[i] == 0:
+                final_array.append(working_board[i])
+                
+        default_board = final_array[:]
+        
+    # Return the array after everything is done
+    return final_array
+        
 
 # TODO : Function that links tiles to each other when there's only one number (e.g. with just a 3, 00T0T becomes 00TTT)
 def linkTiles(current_line, current_board_line):
