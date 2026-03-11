@@ -503,7 +503,7 @@ def fillOverlapping(current_line, current_board_line):
 # Function that checks when there can't be any black tile when there's only one number (e.g. with just a 3, 02000 becomes 020XX)
 def checkRange(current_line, current_board_line):
     # Only proceed when there's only one number in the line
-    if len(current_line) == 1:
+    if len(current_line) == 1 and 'T' in current_board_line:
         # The tile where the black tile is found
         current_tile = 0
 
@@ -535,7 +535,7 @@ def checkRange(current_line, current_board_line):
                 working_board[id_i] = 'F'
             elif i == 'X':
                 working_board[id_i] = 0
-            
+
         return working_board
 
 
