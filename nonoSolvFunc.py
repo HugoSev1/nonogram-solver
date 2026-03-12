@@ -102,12 +102,12 @@ def getRowImage(area_array):
 
 
 # Function that extracts the numbers shown on the Nonogram
-def extractColumnNumbers():
+def extractColumnNumbers(row_amount):
     extractingArray = []
     # Divides the image in 5 chunks
     img = cv2.imread("column-img.png")
     h, w, c, = img.shape
-    n_chunks = 5
+    n_chunks = row_amount
     chunk_width = w // n_chunks
 
     chunks = []
@@ -138,7 +138,7 @@ def extractColumnNumbers():
             best_match = None
             best_score = -1
 
-            for digit in range(1, 5):
+            for digit in range(1, row_amount):
                 template = cv2.imread(f"templates\\{digit}.png", 0)
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
@@ -159,12 +159,12 @@ def extractColumnNumbers():
 
 
 # Function that extracts the numbers shown on the Nonogram (but for the rows this time)
-def extractRowNumbers():
+def extractRowNumbers(row_amount):
     extractingArray = []
     # Divides the image in 5 chunks
     img = cv2.imread("row-img.png")
     h, w, c, = img.shape
-    n_chunks = 5
+    n_chunks = row_amount
     chunk_height = h // n_chunks
 
     chunks = []
@@ -196,7 +196,7 @@ def extractRowNumbers():
             best_match = None
             best_score = -1
 
-            for digit in range(1, 5):
+            for digit in range(1, row_amount):
                 template = cv2.imread(f"templates\\{digit}.png", 0)
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
@@ -483,15 +483,20 @@ def tileCannotFit(current_line, current_board_line):
 # Function that finds when the first or last part of a line is completed
 def extremumCompletion(current_line, current_board_line):
     # An array that contains what we want to have in order to keep the function going
-    theoretical_array = []
+    theoretical_array_first = []
+    theoretical_array_last = []
+    for i in range(current_line[0]):
+        theoretical_array_first.append('T')
+
     for i in range(current_line[-1]):
-        theoretical_array.append('T')
-    test = current_board_line[-current_line[-1]:]
-    if current_board_line[0:current_line[0]] == theoretical_array:
+        theoretical_array_last.append('T')
+
+    if current_board_line[0:current_line[0]] == theoretical_array_first:
         current_board_line[current_line[0]] = 'F'
-    elif test == theoretical_array:
+    elif current_board_line[-current_line[-1]:] == theoretical_array_last:
         current_board_line[-current_line[-1]-1] = 'F'
-        return current_board_line
+
+    return current_board_line
 
 
 # Function that puts black squares on tiles that have 100% probability (i.e. a relative use of the extremum function when all the possibilites overlap)
@@ -576,7 +581,7 @@ def completeLimitedLine(current_line, current_board_line, row_amount):
     working_board = []
     final_array = []
     default_board = current_board_line[:]
-    
+
     # Repeat the function for every number in the line
     for id_n, n in enumerate(current_line):
         current_number = n
@@ -590,13 +595,13 @@ def completeLimitedLine(current_line, current_board_line, row_amount):
         for id_i, i in enumerate(current_working_area):
             if i == 0:
                 working_board.append(default_board[id_i])
-                
+
         # Check tiles when they are the only possible ones
         if current_number == working_board.count('T') + working_board.count(0):
             for id_i, i in enumerate(working_board):
                 if i == 0:
                     working_board[id_i] = 'T'
-                    
+
         # Put everything back in a final array:
         for i in range(row_amount):
             if current_working_area[i] == 'X':
@@ -604,13 +609,65 @@ def completeLimitedLine(current_line, current_board_line, row_amount):
                 working_board.insert(0, 'X')
             elif current_working_area[i] == 0:
                 final_array.append(working_board[i])
-                
+
         default_board = final_array[:]
-        
+
     # Return the array after everything is done
     return final_array
-        
+
+
+# Extend an extremum (e.g. [3] that has the line T000000000 becomes TTT0000000)
+def extendExtremum(current_line, current_board_line):
+    # Check the full part that can change (e.g. 0T0 for [3] to make it 0TT)
+    checking_area_first = []
+    checking_area_last = []
+    final_array = current_board_line[:]
+
+    # Only start when a 'T' is found
+    is_black_tile_found = False
+
+    for i in range(current_line[0]):
+        checking_area_first.append(current_board_line[i])
+
+    if current_line == [5, 1]:
+        print(current_board_line)
+    for i in range(current_line[-1]):
+        checking_area_last.append(current_board_line[-i-1])
+
+    # Do first
+    if 'T' in checking_area_first:
+        for id_i, i in enumerate(checking_area_first):
+            if is_black_tile_found and i == 0:
+                checking_area_first[id_i] = 'T'
+            elif i == 'T':
+                is_black_tile_found = True
+
+    # Do last
+    is_black_tile_found = False
+
+    checking_area_last.reverse()
+
+    if 'T' in checking_area_last:
+        for id_i, i in enumerate(checking_area_last):
+            if is_black_tile_found and i == 0:
+                checking_area_last[id_i] = 'T'
+            elif i == 'T':
+                is_black_tile_found = True
+
+    checking_area_last.reverse()
+
+    # Put the values in the board
+    for id_i, i in enumerate(checking_area_first):
+        final_array[id_i] = i
+
+    for id_i, i in enumerate(checking_area_last):
+        final_array[-id_i - 1] = i
+
+    return final_array
+
 
 # TODO : Function that links tiles to each other when there's only one number (e.g. with just a 3, 00T0T becomes 00TTT)
+
+
 def linkTiles(current_line, current_board_line):
     pass

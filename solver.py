@@ -1,16 +1,19 @@
 import nonoSolvFunc
 import pygame
 
+# How many rows there are
+row_amount = 10
+
 # Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()
 
 # Get the columns digits from here
 column_coords = nonoSolvFunc.getColumnImage(puzzle_coords)
-column_digits = nonoSolvFunc.extractColumnNumbers()
+column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
 
 # Read the digits from the columns
 row_coords = nonoSolvFunc.getRowImage(puzzle_coords)
-row_digits = nonoSolvFunc.extractRowNumbers()
+row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
 
 # Make a two-dimensional array to store the game board
 game_board = []
@@ -37,8 +40,6 @@ for id_i, i in enumerate(column_digits):
 columns_height = max(map(len, column_digits))
 row_width = max(map(len, row_digits))
 
-# How many rows there are
-row_amount = 5
 # Length of the whole board
 board_width = 350
 # Length of the tiles' side
@@ -247,6 +248,20 @@ while previous_board != game_board:
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.completeLimitedLine(
             row_digits[i], current_line, row_amount)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+    # Extend the extremums
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.extendExtremum(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.extendExtremum(
+            row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 
