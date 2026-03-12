@@ -1,14 +1,15 @@
 import nonoSolvFunc
 import pygame
 
-# How many rows there are
-row_amount = 10
 
 # Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()
 
 # Get the columns digits from here
 column_coords = nonoSolvFunc.getColumnImage(puzzle_coords)
+row_amount = nonoSolvFunc.findRowAmount(column_coords)
+
+# How many rows there are
 column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
 
 # Read the digits from the columns
@@ -251,6 +252,7 @@ while previous_board != game_board:
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
     # Extend the extremums
+    
     for i in range(row_amount):
         # Do columns
         current_line = nonoSolvFunc.extractColFromBoard(game_board, i)

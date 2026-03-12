@@ -101,6 +101,30 @@ def getRowImage(area_array):
     return row_coords
 
 
+# Function that returns the amount of rows / columns
+def findRowAmount(coords):
+    # Value that will be returned
+    row_amount = 0
+    scrsh = pyautogui.screenshot()
+    column_color = (248, 236, 194)
+
+    x_start = coords[0]
+    y_start = coords[1]
+
+    # Alternates between True and False depending on the color
+    is_counting = True
+    pyautogui.moveTo(x_start, y_start)
+    for x in range(x_start, x_start + 1000):
+        if scrsh.getpixel((x, y_start)) == column_color and is_counting:
+            row_amount += 1
+            is_counting = False
+
+        elif scrsh.getpixel((x, y_start)) != column_color:
+            is_counting = True
+
+    return row_amount
+
+
 # Function that extracts the numbers shown on the Nonogram
 def extractColumnNumbers(row_amount):
     extractingArray = []
@@ -552,7 +576,8 @@ def checkRange(current_line, current_board_line):
                 current_tile = id_i
                 break
 
-        for i in range(current_tile+1, current_tile+current_line[0]):
+        last_tile = min(current_tile + current_line[0], len(working_board))
+        for i in range(current_tile + 1, last_tile):
             if i <= len(current_board_line) and working_board[i] == 0:
                 working_board[i] = 'X'
 
@@ -622,15 +647,12 @@ def extendExtremum(current_line, current_board_line):
     checking_area_first = []
     checking_area_last = []
     final_array = current_board_line[:]
-
     # Only start when a 'T' is found
     is_black_tile_found = False
 
     for i in range(current_line[0]):
         checking_area_first.append(current_board_line[i])
 
-    if current_line == [5, 1]:
-        print(current_board_line)
     for i in range(current_line[-1]):
         checking_area_last.append(current_board_line[-i-1])
 
@@ -645,16 +667,12 @@ def extendExtremum(current_line, current_board_line):
     # Do last
     is_black_tile_found = False
 
-    checking_area_last.reverse()
-
     if 'T' in checking_area_last:
         for id_i, i in enumerate(checking_area_last):
             if is_black_tile_found and i == 0:
                 checking_area_last[id_i] = 'T'
             elif i == 'T':
                 is_black_tile_found = True
-
-    checking_area_last.reverse()
 
     # Put the values in the board
     for id_i, i in enumerate(checking_area_first):
