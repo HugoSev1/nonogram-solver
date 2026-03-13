@@ -1,6 +1,7 @@
 import pyautogui
 from PIL import ImageGrab
 import cv2
+pyautogui.PAUSE = 0.001
 
 # Display an image (for debugging purposes)
 
@@ -38,7 +39,8 @@ def getPuzzleCoords():
         if scrsh.getpixel((x1+1, y)) == color:
             puzzle_coords.append(y)
             break
-
+            
+    print(puzzle_coords)
     return (puzzle_coords)
 
 
