@@ -684,8 +684,83 @@ def extendExtremum(current_line, current_board_line):
     return final_array
 
 
-# TODO : Function that links tiles to each other when there's only one number (e.g. with just a 3, 00T0T becomes 00TTT)
+# Function that fills every "space" (e.g. with 0TF000FFFF, fill the 0T and the 000 if possible)
+def fillSpaces(current_line, current_board_line):
+    # Return if there'the line is already done
+    if 0 not in current_board_line or 'F' not in current_board_line or len(current_line) < 2:
+        return current_board_line
+    
+    # Array that will get returned
+    final_array = []
 
+    # Gets every combination of the sum of two numbers in a row (e.g. [1,3,2] gives [4,5])
+    line_combinations = []
 
-def linkTiles(current_line, current_board_line):
-    pass
+    # Array that places the spaces one by one
+    current_space = []
+
+    # Array that contains all the spaces
+    spaces = []
+
+    # To separate the spaces
+    is_counting = True
+
+    for i in range(len(current_line)-1):
+        line_combinations.append(current_line[i]+current_line[i+1])
+
+    for i in current_board_line:
+        if i == 'F' and is_counting:
+            is_counting = False
+            spaces.append(current_space[:])
+            current_space.clear()
+
+        elif is_counting:
+            current_space.append(0)
+
+        elif i != 'F':
+            is_counting = True
+            current_space.append(0)
+            
+    if len(current_space) > 0:
+        spaces.append(current_space[:])
+
+    # Only proceed if there can't be two sets of tiles in one space
+    max_space = len(max(spaces, key=len))
+    min_set = min(line_combinations) + 1
+
+    if max_space > min_set or len(current_line) != len(spaces):
+        return current_board_line
+
+    # Now proceed (filling overlapping tiles with 100% rate)
+    for i in range(len(current_line)):
+        for j in range(current_line[i]):
+            spaces[i][j] += 1
+            spaces[i][-j-1] += 1
+
+    for i in spaces:
+        for id_j, j in enumerate(i):
+            if j == 2:
+                i[id_j] = 'T'
+
+            else:
+                i[id_j] = 0
+
+    # One-dimensional array of spaces
+    clean_spaces = []
+    for i in spaces:
+        clean_spaces.extend(i)
+
+    # Put the values back in the original array
+    for id_i, i in enumerate(current_board_line):
+        if i == 0:
+            final_array.append(clean_spaces[0])
+            clean_spaces.pop(0)
+
+        elif i == 'T':
+            final_array.append('T')
+            clean_spaces.pop(0)
+
+        else:
+            final_array.append("F")
+
+    return final_array
