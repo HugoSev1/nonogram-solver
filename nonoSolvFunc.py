@@ -39,7 +39,7 @@ def getPuzzleCoords():
         if scrsh.getpixel((x1+1, y)) == color:
             puzzle_coords.append(y)
             break
-            
+
     print(puzzle_coords)
     return (puzzle_coords)
 
@@ -691,7 +691,7 @@ def fillSpaces(current_line, current_board_line):
     # Return if there'the line is already done
     if 0 not in current_board_line or 'F' not in current_board_line or len(current_line) < 2:
         return current_board_line
-    
+
     # Array that will get returned
     final_array = []
 
@@ -722,7 +722,7 @@ def fillSpaces(current_line, current_board_line):
         elif i != 'F':
             is_counting = True
             current_space.append(0)
-            
+
     if len(current_space) > 0:
         spaces.append(current_space[:])
 
@@ -730,7 +730,7 @@ def fillSpaces(current_line, current_board_line):
     max_space = len(max(spaces, key=len))
     min_set = min(line_combinations) + 1
 
-    if max_space > min_set or len(current_line) != len(spaces):
+    if max_space >= min_set or len(current_line) != len(spaces):
         return current_board_line
 
     # Now proceed (filling overlapping tiles with 100% rate)
@@ -765,4 +765,44 @@ def fillSpaces(current_line, current_board_line):
         else:
             final_array.append("F")
 
+    return final_array
+
+
+# Function that puts F's around blocks of T's that can't be longer (e.g. if 1 is the max, 0T0 becomes FTF)
+def surroundBlocks(current_line, current_board_line):
+    # Takes max value of line
+    max_value = max(current_line)
+
+    # Separate every block of tiles
+    current_block = []
+    blocks = []
+    for i in current_board_line:
+        if i == 'T':
+            current_block.append(i)
+        else:
+            if len(current_block) > 0:
+                blocks.append(current_block[:])
+            current_block.clear()
+            current_block.append(i)
+            if len(current_block) > 0:
+                blocks.append(current_block[:])
+            current_block.clear()
+
+    if len(current_block) > 0:
+        blocks.append(current_block)
+
+    # Surround blocks whenever possible
+    for id_i, i in enumerate(blocks):
+        if 'T' in i:
+            if len(i) == max_value:
+                if id_i > 0:
+                    blocks[id_i-1] = 'F'
+                if id_i < len(blocks) - 1:
+                    blocks[id_i+1] = 'F'
+
+    # Return final array
+    final_array = []
+    for i in blocks:
+        final_array.extend(i)
+        
     return final_array
