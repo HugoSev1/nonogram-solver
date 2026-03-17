@@ -40,7 +40,6 @@ def getPuzzleCoords():
             puzzle_coords.append(y)
             break
 
-    print(puzzle_coords)
     return (puzzle_coords)
 
 
@@ -420,6 +419,8 @@ def doCompleteLine(current_line, current_board_line):
                 complete_array.append('T')
             else:
                 complete_array.append('F')
+    else:
+        return current_board_line
 
     return complete_array
 
@@ -447,6 +448,9 @@ def doCompleteBlackSquares(current_line, current_board_line):
 
         return complete_array
 
+    else:
+        return current_board_line
+
 
 # Function that completes what's possible when a line has only one number and F's (e.g. 3 on a row that is 00TF0 becomes TTTF0)
 def reduceSingularNumbers(current_line, current_board_line):
@@ -468,6 +472,8 @@ def reduceSingularNumbers(current_line, current_board_line):
                 else:
                     working_array.append(0)
 
+    else:
+        return current_board_line
     return working_array
 
 
@@ -527,6 +533,10 @@ def extremumCompletion(current_line, current_board_line):
 
 # Function that puts black squares on tiles that have 100% probability (i.e. a relative use of the extremum function when all the possibilites overlap)
 def fillOverlapping(current_line, current_board_line):
+    # Return the board line if it's already done
+    if 0 not in current_board_line:
+        return current_board_line
+
     # The board that will be modified
     working_board = current_board_line[:]
 
@@ -543,6 +553,7 @@ def fillOverlapping(current_line, current_board_line):
 
         # Initial board (with the original T's)
         initial_board = working_board[:]
+
         working_board.clear()
         for i in range(len(initial_board)):
             working_board.append(0)
@@ -555,12 +566,15 @@ def fillOverlapping(current_line, current_board_line):
                 working_board[id_i] = 'T'
 
             else:
-                working_board[id_i] = 0
+                working_board[id_i] = initial_board[id_i]
 
         final_board.extend(board_beginning)
         final_board.extend(working_board)
 
         return final_board
+    
+    else:
+        return current_board_line
 
 
 # Function that checks when there can't be any black tile when there's only one number (e.g. with just a 3, 02000 becomes 020XX)
@@ -601,6 +615,9 @@ def checkRange(current_line, current_board_line):
                 working_board[id_i] = 0
 
         return working_board
+
+    else:
+        return current_board_line
 
 
 # Function that completes lines in a limited area
@@ -804,5 +821,80 @@ def surroundBlocks(current_line, current_board_line):
     final_array = []
     for i in blocks:
         final_array.extend(i)
-        
+
     return final_array
+
+
+# Function that removes the largest number if it's already done, and repeats the function
+def removeLargest(current_line, current_board_line):
+    # Final board
+    final_board = []
+
+    working_array = current_board_line[:]
+    working_line = current_line[:]
+    black_tile_groups = []
+
+    # Stop the while when it changes nothing
+    previous_line = []
+
+    # Remove everything that we can
+    while previous_line != working_line:
+        previous_line = working_line[:]
+        black_tiles_counter = 0
+        for i in current_board_line:
+            if i == 'T':
+                black_tiles_counter += 1
+            else:
+                if black_tiles_counter > 0:
+                    black_tile_groups.append(black_tiles_counter)
+                    black_tiles_counter = 0
+
+        # Include the last one
+        if black_tiles_counter > 0:
+            black_tile_groups.append(black_tiles_counter)
+
+        # Return the original board if there's no black squares
+        if len(black_tile_groups) == 0:
+            return current_board_line
+
+        # Only remove if max value appears as much on the board as it exists in the line
+        if max(working_line) == max(black_tile_groups):
+            if working_line.count(max(working_line)) == black_tile_groups.count(max(black_tile_groups)):
+                for i in range(len(working_array) - max(working_line) + 1):
+                    current_section = working_array[i:i+max(working_line)]
+                    if 'T' in current_section and 'F' not in current_section and 0 not in current_section:
+                        # Mark unnecessary tiles with 'F'
+                        for i in range(i, i+max(working_line)):
+                            working_array[i] = 'F'
+                        working_line.remove(max(working_line))
+                        if len(working_line) < 1:
+                            return current_board_line
+
+    # Return the original board line if the working line is the same as the default line
+    if working_line == current_line:
+        return current_board_line
+
+    # Do all relative functions otherwise
+    working_array = doCompleteLine(working_line, working_array)
+    working_array = doCompleteBlackSquares(working_line, working_array)
+    working_array = reduceSingularNumbers(working_line, working_array)
+    working_array.reverse()
+    working_array = reduceSingularNumbers(working_line, working_array)
+    working_array.reverse()
+    working_array = tileCannotFit(working_line, working_array)
+    working_array = extremumCompletion(working_line, working_array)
+    working_array = fillOverlapping(working_line, working_array)
+    working_array = checkRange(working_line, working_array)
+    working_array = completeLimitedLine(
+        working_line, working_array, len(working_array))
+    working_array = extendExtremum(working_line, working_array)
+    working_array = fillSpaces(working_line, working_array)
+    working_array = surroundBlocks(working_line, working_array)
+
+    for i in range(len(current_board_line)):
+        if current_board_line[i] == 'T':
+            final_board.append('T')
+        else:
+            final_board.append(working_array[i])
+
+    return final_board
