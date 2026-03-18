@@ -15,7 +15,7 @@ def showImg(img):
 def getPuzzleCoords():
     puzzle_coords = []
     # Getting the top left coordinates
-    color = (133, 163, 224)
+    color = (61, 63, 65)
     scrsh = pyautogui.screenshot()
     for x in range(200, 1500):
         for y in range(100, 1000):
@@ -61,7 +61,7 @@ def getColumnImage(area_array):
     color = (0, 0, 0)
     while scrsh.getpixel((xColumn, yColumn)) != color:
         yColumn += 1
-    color = (42, 43, 35)
+    color = (28, 30, 32)
     while scrsh.getpixel((xColumn, yColumn)) != color:
         xColumn += 1
     column_coords.append(xColumn)
@@ -90,7 +90,7 @@ def getRowImage(area_array):
     color = (0, 0, 0)
     while scrsh.getpixel((xColumn, yColumn)) != color:
         xColumn += 1
-    color = (42, 43, 35)
+    color = (28, 30, 32)
     while scrsh.getpixel((xColumn, yColumn)) != color:
         yColumn += 1
     row_coords.append(xColumn)
@@ -244,7 +244,7 @@ def extractRowNumbers(row_amount):
 # Function that gets the board's coordinates from the browser in order to place the tiles directly
 def getBoardCoords(x1, y1):
     board_coords = [x1, y1]
-    color = (42, 43, 35)
+    color = (28, 30, 32)
     scrsh = pyautogui.screenshot()
 
     # Append the X at the right of the board
@@ -572,7 +572,7 @@ def fillOverlapping(current_line, current_board_line):
         final_board.extend(working_board)
 
         return final_board
-    
+
     else:
         return current_board_line
 
@@ -825,7 +825,34 @@ def surroundBlocks(current_line, current_board_line):
     return final_array
 
 
+# Function that fills a gap between two black tiles (e.g. with 3, 00T0T becomes 00TTT)
+def joinTiles(current_line, current_board_line):
+    # Board that we work with
+    working_board = current_board_line[:]
+    # Only proceed when there's only one number in the line and there's at least two tiles to join
+    if len(current_line) == 1 and working_board.count('T') >= 2:
+        # Fill the gap when true
+        is_currently_filling = False
+
+        for id_i, i in enumerate(working_board):
+            if i == 'T' and is_currently_filling == False:
+                is_currently_filling = True
+            elif i == 0 and is_currently_filling:
+                working_board[id_i] = 'T'
+            elif i == 'T' and is_currently_filling and 'T' not in working_board[id_i + 1:]:
+                is_currently_filling = False
+
+        if current_line == [4]:
+            print(working_board)
+        return working_board
+
+    # Return the original board if there's more than one number in the line
+    else:
+        return current_board_line
+
+
 # Function that removes the largest number if it's already done, and repeats the function
+# Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
     # Final board
     final_board = []
@@ -836,6 +863,43 @@ def removeLargest(current_line, current_board_line):
 
     # Stop the while when it changes nothing
     previous_line = []
+
+    # Check the first and last
+    marked_area = []
+    empty_area = []
+    checked_area = []
+
+    for i in range(2):
+        # Where the marked cases are located
+        marked_tile_spot = 0
+
+        # Will become true if the part in question exists in the board line
+        is_marked_present = False
+
+        for i in range(working_line[0]):
+            marked_area.append('T')
+            empty_area.append(0)
+
+        # Find if the searched part is here
+        for id_i, i in enumerate(working_array):
+            if working_array[id_i:id_i+working_line[0]] == marked_area:
+                checked_area = working_array[:id_i]
+                marked_tile_spot = id_i
+                is_marked_present = True
+                break
+
+        if set(empty_area).issubset(checked_area) == False and is_marked_present and len(working_line) >= 2:
+            for id_i, i in enumerate(working_array[marked_tile_spot:marked_tile_spot + working_line[0]]):
+                working_array[id_i + marked_tile_spot] = 'F'
+
+            working_line.pop(0)
+
+        working_array.reverse()
+        working_line.reverse()
+
+        marked_area.clear()
+        empty_area.clear()
+        checked_area.clear()
 
     # Remove everything that we can
     while previous_line != working_line:
@@ -890,6 +954,7 @@ def removeLargest(current_line, current_board_line):
     working_array = extendExtremum(working_line, working_array)
     working_array = fillSpaces(working_line, working_array)
     working_array = surroundBlocks(working_line, working_array)
+    working_array = joinTiles(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
