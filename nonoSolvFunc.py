@@ -842,13 +842,89 @@ def joinTiles(current_line, current_board_line):
             elif i == 'T' and is_currently_filling and 'T' not in working_board[id_i + 1:]:
                 is_currently_filling = False
 
-        if current_line == [4]:
-            print(working_board)
         return working_board
 
     # Return the original board if there's more than one number in the line
     else:
         return current_board_line
+
+
+# Function that completes the beginning (e.g. with 3, FTTT000000 becomes FTTTF00000)
+def fillBeginning(current_line, current_board_line):
+    # Return the original board if the line is done
+    if 0 not in current_board_line:
+        return current_board_line
+    
+    # Board that we'll work with
+    working_board = current_board_line[:]
+
+    # Used to compare later
+    empty_part = []
+    marked_part = []
+    for i in range(current_line[0]):
+        marked_part.append('T')
+        empty_part.append(0)
+
+    for i in range(2):
+        for i in range(len(working_board)):
+            if 'F' not in working_board[i:i+current_line[0]] and 0 in working_board[i:i+current_line[0]]:
+                break
+
+            elif working_board[i:i+current_line[0]] == marked_part:
+                working_board[i+current_line[0]] = 'F'
+                break
+
+        current_line.reverse()
+        working_board.reverse()
+
+    return working_board
+
+
+# Function that puts F's when there's only one number and it can't go further (e.g. with [6], 0TTTTT0000 becomes 0TTTTT0FFF)
+def crossReach(current_line, current_board_line):
+    # Return the original board when there's no reason to proceed
+    if 0 not in current_board_line or 'T' not in current_board_line:
+        return current_board_line
+    
+    # Only proceed when there's only one number in the current line
+    if len(current_line) > 1:
+        return current_board_line
+
+    else:
+        # Board that we'll work with
+        working_board = current_board_line[:]
+
+        # Do it twice (forward and backwards)
+        for i in range(2):
+            # Subsection of the board
+            sub_board = []
+
+            for id_i, i in enumerate(working_board):
+                if i == 'T':
+                    sub_board.append(working_board[:id_i])
+                    sub_board.append(working_board[id_i:id_i+current_line[0]])
+                    sub_board.append(working_board[id_i+current_line[0]:])
+                    break
+
+            for id_i, i in enumerate(sub_board[1]):
+                if i == 0:
+                    sub_board[1][id_i] = 'X'
+
+            working_board.clear()
+            for i in sub_board:
+                working_board.extend(i)
+
+            working_board.reverse()
+
+        # Put the F's and restaure the 0's
+        for id_i, i in enumerate(working_board):
+            if i == 0:
+                working_board[id_i] = 'F'
+            
+            elif i == 'X':
+                working_board[id_i] = 0
+                
+        return working_board
 
 
 # Function that removes the largest number if it's already done, and repeats the function
@@ -955,6 +1031,8 @@ def removeLargest(current_line, current_board_line):
     working_array = fillSpaces(working_line, working_array)
     working_array = surroundBlocks(working_line, working_array)
     working_array = joinTiles(working_line, working_array)
+    working_array = fillBeginning(working_line, working_array)
+    working_array = crossReach(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
