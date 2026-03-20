@@ -854,7 +854,7 @@ def fillBeginning(current_line, current_board_line):
     # Return the original board if the line is done
     if 0 not in current_board_line:
         return current_board_line
-    
+
     # Board that we'll work with
     working_board = current_board_line[:]
 
@@ -885,7 +885,7 @@ def crossReach(current_line, current_board_line):
     # Return the original board when there's no reason to proceed
     if 0 not in current_board_line or 'T' not in current_board_line:
         return current_board_line
-    
+
     # Only proceed when there's only one number in the current line
     if len(current_line) > 1:
         return current_board_line
@@ -920,11 +920,85 @@ def crossReach(current_line, current_board_line):
         for id_i, i in enumerate(working_board):
             if i == 0:
                 working_board[id_i] = 'F'
-            
+
             elif i == 'X':
                 working_board[id_i] = 0
-                
+
         return working_board
+
+
+# Function that fills what's possible when there's only one space (e.g. with [2], FF000FFFFF becomes FF0T0FFFFF)
+def fillOneSpace(current_line, current_board_line):
+    # Return the original board when there's more than one number in the line or the line is full
+    if len(current_line) > 1 or 0 not in current_board_line:
+        return current_board_line
+
+    # To separate each part of the board line
+    board_chunk = []
+
+    # See how many empty spaces there are
+    empty_counter = 0
+
+    # Board that contains every chunk
+    working_board = []
+    
+    # Clean (one-dimensional) version of the above board
+    clean_working_board = []
+    
+    # Board that will get returned
+    final_board = []
+    
+    for id_i, i in enumerate(current_board_line[:-1]):
+        board_chunk.append(i)
+        if i != current_board_line[id_i + 1]:
+            working_board.append(board_chunk[:])
+            board_chunk.clear()
+
+    # Put the rest
+    working_board.append(board_chunk)
+    working_board.append(current_board_line[-1:])
+
+    for i in working_board:
+        if 0 in i:
+            empty_counter += 1
+
+    # Only proceed if there's only one space
+    if empty_counter != 1:
+        return current_board_line
+    else:
+        # Place the numbers
+        for i in working_board:
+            if 0 not in i:
+                continue
+            else:
+                for j in range(current_line[0]):
+                    if i[j] != 0:
+                        i[j] = 0
+                    i[j] += 1
+                    i[-j-1] += 1
+
+    # Put the T's
+    for i in working_board:
+        if 1 not in i or 2 not in i:
+            continue
+        else:
+            for id_j, j in enumerate(i):
+                if j > 1:
+                    i[id_j] = 'T'
+                else:
+                    i[id_j] = 0
+
+    for i in working_board:
+        clean_working_board.extend(i)
+        
+        
+    for i in range(len(current_board_line)):
+        if current_board_line[i] == 'T':
+            final_board.append(current_board_line[i])
+        else:
+            final_board.append(clean_working_board[i])
+            
+    return final_board
 
 
 # Function that removes the largest number if it's already done, and repeats the function
@@ -1033,6 +1107,7 @@ def removeLargest(current_line, current_board_line):
     working_array = joinTiles(working_line, working_array)
     working_array = fillBeginning(working_line, working_array)
     working_array = crossReach(working_line, working_array)
+    working_array = fillOneSpace(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':

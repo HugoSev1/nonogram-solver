@@ -336,6 +336,20 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.crossReach(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Fill singular spaces
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillOneSpace(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillOneSpace(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
     # Do every relative function without considering the largest numbers
     for i in range(row_amount):
