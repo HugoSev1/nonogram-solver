@@ -48,7 +48,7 @@ tile_width = board_width/row_amount
 # Shift from the top left corner
 grid_shift = 20
 
-
+'''
 # Setup for text displaying
 pygame.font.init()
 font = pygame.font.SysFont("Arial", int(tile_width))
@@ -92,7 +92,7 @@ for i in range(len(row_digits)):
 # Make a rectangle for the board
 pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
     grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
-
+'''
 
 # FIRST PART: only has to be done once
 # Do the lines that have only one possibility
@@ -336,7 +336,7 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.crossReach(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-        
+
     # Fill singular spaces
     for i in range(row_amount):
         # Do columns
@@ -348,6 +348,48 @@ while previous_board != game_board:
         # Do rows
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.fillOneSpace(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+    # Fill extremums when possible
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillExtremum(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillExtremum(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Complete the beginning and / or the end when marked tiles have to be here
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.completeBeginning(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.completeBeginning(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Fill the largest part(s) when possible
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillLargest(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillLargest(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
@@ -365,7 +407,7 @@ while previous_board != game_board:
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
-
+'''
 # ------------------------
 # Draw the tiles in Pygame
 # ------------------------
@@ -388,10 +430,10 @@ while gameRunning:
     pygame.display.update()
 
 pygame.quit()
-
+'''
 
 # ---------------------------
 # Place the tiles in the game
 # ---------------------------
 board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
-# nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
+nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
