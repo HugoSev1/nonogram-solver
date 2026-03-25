@@ -705,7 +705,7 @@ def extendExtremum(current_line, current_board_line):
 
 # Function that fills every "space" (e.g. with 0TF000FFFF, fill the 0T and the 000 if possible)
 def fillSpaces(current_line, current_board_line):
-    # Return if there'the line is already done
+    # Return if the line is already done
     if 0 not in current_board_line or 'F' not in current_board_line or len(current_line) < 2:
         return current_board_line
 
@@ -1154,14 +1154,65 @@ def stopAfterLastMax(current_line, current_board_line):
     for i in range(2):
         if marked_tiles.count(marked_array) == working_line.count(max(working_line)) and working_line[-1] == max(working_line):
             for id_i, i in enumerate(working_board):
-                if working_board[-id_i] == 'T':
+                if working_board[-id_i - 1] == 'T':
                     break
                 else:
-                    working_board[-id_i] = 'F'
-                    
+                    working_board[-id_i - 1] = 'F'
+
         working_line.reverse()
         working_board.reverse()
-                
+
+    return working_board
+
+
+# Function that fills the beginning of a line when the first number is done (e.g. with [1, 4], F0F1FTTFFF becomes FFFTFTT000)
+def fillBeforeBeginning(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = current_board_line[:]
+
+    # Board that we'll try to find (will be filled later)
+    theoretical_board = []
+
+    # Board full of F's of same length as the board above (will be filled later)
+    crossed_board = []
+
+    # Working line
+    working_line = current_line[:]
+
+    if len(working_line) > 1:
+        # Do forward and backwards
+        for n in range(2):
+            if working_line[0] == working_line[1]:
+                # Clear everything and do backwards
+                working_line.reverse()
+                working_board.reverse()
+                theoretical_board.clear()
+                crossed_board.clear()
+                continue
+            else:
+                # Fill the theoretical board
+                theoretical_board.append('F')
+                for i in range(working_line[0]):
+                    theoretical_board.append('T')
+                theoretical_board.append('F')
+
+                # Fill the crossed board
+                for i in range(len(theoretical_board)):
+                    crossed_board.append('F')
+
+                for i in range(len(working_board) - len(theoretical_board) + 1):
+                    if working_board[i:i + len(theoretical_board)] == theoretical_board:
+                        for i in range(len(working_board[0:i])):
+                            working_board[i] = 'F'
+                    elif working_board[i] == 'T':
+                        break
+
+            # Clear everything and do backwards
+            working_line.reverse()
+            working_board.reverse()
+            theoretical_board.clear()
+            crossed_board.clear()
+
     return working_board
 
 
