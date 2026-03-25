@@ -1064,8 +1064,6 @@ def completeBeginning(current_line, current_board_line):
         working_line.reverse()
         working_board.clear()
 
-    if current_line == [4]:
-        print(original_board)
     return original_board
 
 
@@ -1106,7 +1104,7 @@ def fillLargest(current_line, current_board_line):
     for i in working_board:
         spaces_length.append(len(i))
 
-    if current_line.count(max_value) == spaces_length.count(max_value):
+    if current_line.count(max_value) == spaces_length.count(max_value) and max_value == max(spaces_length):
         for i in working_board:
             if len(i) == max_value:
                 for id_j, j in enumerate(i):
@@ -1125,6 +1123,46 @@ def fillLargest(current_line, current_board_line):
             clean_working_board.pop(0)
 
     return final_board
+
+
+# Function that places F's after the largest if it's put as the last (e.g. with [1, 2] 00FTTFF000 becomes 00FTTFFFFF)
+def stopAfterLastMax(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = current_board_line[:]
+
+    # Copy of the current line
+    working_line = current_line[:]
+
+    # Individual spaces
+    current_space = []
+
+    # Fully marked array with a length of max number in line
+    marked_array = []
+    for i in range(max(working_line)):
+        marked_array.append('T')
+
+    # Put T's in an array
+    marked_tiles = []
+    for i in current_board_line:
+        if i == 'T':
+            current_space.append(i)
+        else:
+            if len(current_space) > 0:
+                marked_tiles.append(current_space[:])
+                current_space.clear()
+
+    for i in range(2):
+        if marked_tiles.count(marked_array) == working_line.count(max(working_line)) and working_line[-1] == max(working_line):
+            for id_i, i in enumerate(working_board):
+                if working_board[-id_i] == 'T':
+                    break
+                else:
+                    working_board[-id_i] = 'F'
+                    
+        working_line.reverse()
+        working_board.reverse()
+                
+    return working_board
 
 
 # Function that removes the largest number if it's already done, and repeats the function
@@ -1237,6 +1275,7 @@ def removeLargest(current_line, current_board_line):
     working_array = fillExtremum(working_line, working_array)
     working_array = completeBeginning(working_line, working_array)
     working_array = fillLargest(working_line, working_array)
+    working_array = stopAfterLastMax(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':

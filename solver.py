@@ -364,7 +364,7 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.fillExtremum(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-        
+
     # Complete the beginning and / or the end when marked tiles have to be here
     for i in range(row_amount):
         # Do columns
@@ -378,7 +378,7 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.completeBeginning(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-        
+
     # Fill the largest part(s) when possible
     for i in range(row_amount):
         # Do columns
@@ -390,6 +390,20 @@ while previous_board != game_board:
         # Do rows
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.fillLargest(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Fill the largest part(s) when possible
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.stopAfterLastMax(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.stopAfterLastMax(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
