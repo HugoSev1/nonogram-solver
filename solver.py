@@ -420,6 +420,20 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.fillBeforeBeginning(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Fill before first when possible
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.relFullLine(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.relFullLine(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
     # Do every relative function without considering the largest numbers
     for i in range(row_amount):

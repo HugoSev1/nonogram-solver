@@ -1216,6 +1216,50 @@ def fillBeforeBeginning(current_line, current_board_line):
     return working_board
 
 
+# Relative equivalent of doFullLine (e.g. with [4, 1, 1] FTTTTF000F becomes FTTTTFTFTF)
+def relFullLine(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = current_board_line[:]
+
+    # Line that we'll work with
+    working_line = current_line[:]
+
+    # Slice to remove the F's at the extremums
+    crossed_beginning = 0
+    crossed_end = len(working_board) - 1
+    while working_board[crossed_beginning] == 'F':
+        crossed_beginning += 1
+
+    while working_board[crossed_end] == 'F':
+        crossed_end -= 1
+
+    sliced_board = working_board[crossed_beginning:crossed_end + 1]
+
+    # Board that will be filled later
+    changed_slice = []
+
+    # Only proceed when possible
+    if len(sliced_board) == sum(current_line) + len(current_line) - 1 and 'T' not in current_board_line:
+        for i in range(len(current_line)-1):
+            if i % 2 == 0:
+                working_line.insert(i+1, 0)
+    else:
+        return current_board_line
+
+    # Fill the board
+    for i in working_line:
+        if i == 0:
+            changed_slice.append('F')
+        else:
+            for j in range(i):
+                changed_slice.append('T')
+            
+    # Put the changed board back in the working board
+    working_board[crossed_beginning:crossed_end + 1] = changed_slice
+        
+    return working_board
+
+
 # Function that removes the largest number if it's already done, and repeats the function
 # Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
@@ -1327,6 +1371,8 @@ def removeLargest(current_line, current_board_line):
     working_array = completeBeginning(working_line, working_array)
     working_array = fillLargest(working_line, working_array)
     working_array = stopAfterLastMax(working_line, working_array)
+    working_array = fillBeforeBeginning(working_line, working_array)
+    working_array = relFullLine(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
