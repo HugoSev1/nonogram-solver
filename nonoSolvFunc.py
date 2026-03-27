@@ -1253,10 +1253,51 @@ def relFullLine(current_line, current_board_line):
         else:
             for j in range(i):
                 changed_slice.append('T')
-            
+
     # Put the changed board back in the working board
     working_board[crossed_beginning:crossed_end + 1] = changed_slice
-        
+
+    return working_board
+
+
+# Function that puts F's when T's would have created an impossible line (e.g. with [1, 4] F0FT0TTT0F tries F0FTTTTT0F but becomes F0FTFTTT0F because the line contains 5 T's and 4 is the max)
+def removeImpossible(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = current_board_line[:]
+
+    # Put the T's in a list and verify
+    marked_array = []
+    current_space = []
+
+    for id_i, i in enumerate(working_board):
+        # Put a T in the board at the desired index
+        working_board[id_i] = 'T'
+
+        for j in working_board:
+            if j == 'T':
+                current_space.append('T')
+            elif len(current_space) > 0:
+                marked_array.append(current_space[:])
+                current_space.clear()
+
+        # Put the last one if there's some left
+        if len(current_space) > 0:
+            marked_array.append(current_space[:])
+            current_space.clear()
+
+        # Change the board if needed
+        if len(marked_array) > 0:
+            if len(max(marked_array, key=len)) > max(current_line):
+                working_board[id_i] = 'F'
+            else:
+                working_board[id_i] = current_board_line[id_i]
+        else:
+            working_board[id_i] = current_board_line[id_i]
+
+        # Reset before looping
+        marked_array.clear()
+        current_space.clear()
+
     return working_board
 
 
