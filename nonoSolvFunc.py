@@ -30,12 +30,12 @@ def getPuzzleCoords():
     y1 = puzzle_coords[1]
 
     # Getting the bottom right coordinates
-    for x in range(x1+1, 1500):
+    for x in range(x1+1, 2500):
         if scrsh.getpixel((x, y1+1)) == color:
             puzzle_coords.append(x)
             break
 
-    for y in range(y1+1, 1000):
+    for y in range(y1+1, 2000):
         if scrsh.getpixel((x1+1, y)) == color:
             puzzle_coords.append(y)
             break
@@ -985,7 +985,7 @@ def fillOneSpace(current_line, current_board_line):
 
     # Put the T's
     for i in working_board:
-        if 1 not in i or 2 not in i:
+        if 1 not in i and 2 not in i:
             continue
         else:
             for id_j, j in enumerate(i):
@@ -1301,6 +1301,101 @@ def removeImpossible(current_line, current_board_line):
     return working_board
 
 
+# Function that checks overlapping tiles for several numbers in a row (e.g. for [2, 2] 000000 becomes 0T00T0)
+def multiOverlap(current_line, current_board_line):
+    # Trim the beginning of the board
+    first_not_crossed = 0
+    for i in range(len(current_board_line)):
+        if i != 'F':
+            first_not_crossed = i
+            break
+
+    # Trim the end of the board
+    last_not_crossed = 0
+    for i in range(len(current_board_line)):
+        if 'T' not in current_board_line[i:] and 0 not in current_board_line[i:]:
+            last_not_crossed = i
+            break
+
+    # Original working board
+    original_working_board = current_board_line[first_not_crossed:last_not_crossed]
+
+    # Board that we'll work with (empty version of the original one)
+    working_board = []
+
+    for i in original_working_board:
+        working_board.append(0)
+
+    # Don't continue if there's any F in the working board or if the whole line is already done
+    if 'F' in working_board or 0 not in current_board_line:
+        return current_board_line
+
+    # Smallest board with the current line numbers
+    smallest_board = []
+
+    # Final board that will be put in the returned board
+    final_board = []
+
+    # Fill from the beginning
+    for i in current_line:
+        for j in range(i):
+            smallest_board.append(1)
+        smallest_board.append(0)
+
+    # Remove the last zero
+    smallest_board.pop(-1)
+
+    # Highest amount of times the smallest board can be put in the working board
+    highest_amount = len(working_board) - len(smallest_board) + 1
+
+    # Place the numbers in the working board
+    for i in range(highest_amount):
+        for j in range(len(smallest_board)):
+            working_board[i + j] += smallest_board[j]
+
+    # Place the numbers in the final board
+    for i in range(len(working_board)):
+        if working_board[i] != highest_amount:
+            final_board.append(original_working_board[i])
+        else:
+            final_board.append('T')
+
+    # Board that will get returned
+    returned_board = current_board_line[:]
+
+    # Put the final board in the returned board
+    returned_board[first_not_crossed:last_not_crossed] = final_board
+
+    # Return that board
+    return returned_board
+
+
+# Function that puts F's in the beginning if needed (e.g. with [2], 0F00000000 becomes FF00000000)
+def crossBeginning(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = current_board_line[:]
+
+    # Line that we'll work with
+    working_line = current_line[:]
+
+    # Check if there's place at the beginning of the board for the first number
+    for n in range(2):
+        if 'F' in working_board[:working_line[0]]:
+            # Place the F tiles
+            for id_i, i in enumerate(working_board[:working_line[0]]):
+                if i != 'F':
+                    working_board[id_i] = 'F'
+                else:
+                    break
+
+        # Do it a second time from the end
+        working_line.reverse()
+        working_board.reverse()
+
+    # Return the working board
+    return working_board
+
+
 # Function that removes the largest number if it's already done, and repeats the function
 # Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
@@ -1414,6 +1509,9 @@ def removeLargest(current_line, current_board_line):
     working_array = stopAfterLastMax(working_line, working_array)
     working_array = fillBeforeBeginning(working_line, working_array)
     working_array = relFullLine(working_line, working_array)
+    working_array = removeImpossible(working_line, working_array)
+    working_array = multiOverlap(working_line, working_array)
+    working_array = crossBeginning(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
