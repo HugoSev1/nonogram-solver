@@ -126,6 +126,10 @@ def findRowAmount(coords):
     return row_amount
 
 
+# Best score (for recognition accuracy)
+extraction_best_score = 0.7
+
+
 # Function that extracts the numbers shown on the Nonogram
 def extractColumnNumbers(row_amount):
     extractingArray = []
@@ -175,10 +179,31 @@ def extractColumnNumbers(row_amount):
                     best_score = score
                     best_match = digit
 
-            if (best_score > 0.7):
-                digits.append((best_match, y))
+            if (best_score > extraction_best_score):
+                digits.append((best_match, y, h2))
         digits.sort(key=lambda x: x[1])
-        result = [d[0] for d in digits]
+        numbers = []
+        if digits:
+            current_group = [digits[0]]
+
+            for i in range(1, len(digits)):
+                prev_bottom = digits[i-1][1] + digits[i-1][2]
+                curr_y = digits[i][1]
+
+                # Can be adjusted
+                spacing_threshold = h // 20
+
+                if curr_y - prev_bottom < spacing_threshold:
+                    current_group.append(digits[i])
+                else:
+                    numbers.append(current_group)
+                    current_group = [digits[i]]
+
+            numbers.append(current_group)
+
+        # Convert grouped digits into actual numbers
+        result = [int("".join(str(d[0]) for d in group)) for group in numbers]
+
         extractingArray.append(result)
     return extractingArray
 
@@ -233,10 +258,31 @@ def extractRowNumbers(row_amount):
                     best_score = score
                     best_match = digit
 
-            if (best_score > 0.7):
-                digits.append((best_match, x))
+            if (best_score > extraction_best_score):
+                digits.append((best_match, x, w2))
         digits.sort(key=lambda x: x[1])
-        result = [d[0] for d in digits]
+        numbers = []
+        if digits:
+            current_group = [digits[0]]
+
+            for i in range(1, len(digits)):
+                prev_right = digits[i-1][1] + digits[i-1][2]
+                curr_x = digits[i][1]
+
+                # Can be adjusted
+                spacing_threshold = w // 20
+
+                if curr_x - prev_right < spacing_threshold:
+                    current_group.append(digits[i])
+                else:
+                    numbers.append(current_group)
+                    current_group = [digits[i]]
+
+            numbers.append(current_group)
+
+        # Convert grouped digits into actual numbers
+        result = [int("".join(str(d[0]) for d in group)) for group in numbers]
+
         extractingArray.append(result)
     return extractingArray
 
@@ -1447,9 +1493,6 @@ def removeLargest(current_line, current_board_line):
             marked_area.clear()
             empty_area.clear()
             checked_area.clear()
-
-    if current_line == [3, 3, 2]:
-        print(working_line)
 
     # Remove everything that we can
     while previous_line != working_line:

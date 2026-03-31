@@ -48,7 +48,7 @@ tile_width = board_width/row_amount
 # Shift from the top left corner
 grid_shift = 20
 
-'''
+
 # Setup for text displaying
 pygame.font.init()
 font = pygame.font.SysFont("Arial", int(tile_width))
@@ -92,7 +92,7 @@ for i in range(len(row_digits)):
 # Make a rectangle for the board
 pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
     grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
-'''
+
 
 # FIRST PART: only has to be done once
 # Do the lines that have only one possibility
@@ -491,7 +491,7 @@ while previous_board != game_board:
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
-'''
+
 # ------------------------
 # Draw the tiles in Pygame
 # ------------------------
@@ -514,10 +514,10 @@ while gameRunning:
     pygame.display.update()
 
 pygame.quit()
-'''
+
 
 # ---------------------------
 # Place the tiles in the game
 # ---------------------------
 board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
-nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
+# nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
