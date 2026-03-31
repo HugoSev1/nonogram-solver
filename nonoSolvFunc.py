@@ -1414,37 +1414,42 @@ def removeLargest(current_line, current_board_line):
     empty_area = []
     checked_area = []
 
-    for i in range(2):
-        # Where the marked cases are located
-        marked_tile_spot = 0
+    while previous_line != working_line:
+        previous_line = working_line[:]
+        for i in range(2):
+            # Where the marked cases are located
+            marked_tile_spot = 0
 
-        # Will become true if the part in question exists in the board line
-        is_marked_present = False
+            # Will become true if the part in question exists in the board line
+            is_marked_present = False
 
-        for i in range(working_line[0]):
-            marked_area.append('T')
-            empty_area.append(0)
+            for i in range(working_line[0]):
+                marked_area.append('T')
+                empty_area.append(0)
 
-        # Find if the searched part is here
-        for id_i, i in enumerate(working_array):
-            if working_array[id_i:id_i+working_line[0]] == marked_area:
-                checked_area = working_array[:id_i]
-                marked_tile_spot = id_i
-                is_marked_present = True
-                break
+            # Find if the searched part is here
+            for id_i, i in enumerate(working_array):
+                if working_array[id_i:id_i+working_line[0]] == marked_area:
+                    checked_area = working_array[:id_i]
+                    marked_tile_spot = id_i
+                    is_marked_present = True
+                    break
 
-        if set(empty_area).issubset(checked_area) == False and is_marked_present and len(working_line) >= 2:
-            for id_i, i in enumerate(working_array[marked_tile_spot:marked_tile_spot + working_line[0]]):
-                working_array[id_i + marked_tile_spot] = 'F'
+            if set(empty_area).issubset(checked_area) == False and is_marked_present and len(working_line) >= 2:
+                for id_i, i in enumerate(working_array[marked_tile_spot:marked_tile_spot + working_line[0]]):
+                    working_array[id_i + marked_tile_spot] = 'F'
 
-            working_line.pop(0)
+                working_line.pop(0)
 
-        working_array.reverse()
-        working_line.reverse()
+            working_array.reverse()
+            working_line.reverse()
 
-        marked_area.clear()
-        empty_area.clear()
-        checked_area.clear()
+            marked_area.clear()
+            empty_area.clear()
+            checked_area.clear()
+
+    if current_line == [3, 3, 2]:
+        print(working_line)
 
     # Remove everything that we can
     while previous_line != working_line:
