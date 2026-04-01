@@ -167,7 +167,7 @@ def extractColumnNumbers(row_amount):
             best_match = None
             best_score = -1
 
-            for digit in range(1, row_amount):
+            for digit in range(0, row_amount):
                 template = cv2.imread(f"templates\\{digit}.png", 0)
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
@@ -180,15 +180,15 @@ def extractColumnNumbers(row_amount):
                     best_match = digit
 
             if (best_score > extraction_best_score):
-                digits.append((best_match, y, h2))
-        digits.sort(key=lambda x: x[1])
+                digits.append((best_match, x, y, h2))
+        digits.sort(key=lambda x: x[2])
         numbers = []
         if digits:
             current_group = [digits[0]]
 
             for i in range(1, len(digits)):
-                prev_bottom = digits[i-1][1] + digits[i-1][2]
-                curr_y = digits[i][1]
+                prev_bottom = digits[i-1][2] + digits[i-1][3]
+                curr_y = digits[i][2]
 
                 # Can be adjusted
                 spacing_threshold = h // 20
@@ -202,7 +202,14 @@ def extractColumnNumbers(row_amount):
             numbers.append(current_group)
 
         # Convert grouped digits into actual numbers
-        result = [int("".join(str(d[0]) for d in group)) for group in numbers]
+        result = []
+
+        for group in numbers:
+            # Sort digits from left to right to reconstruct them (e.g. if a 10 is above a 2, make 10 from left to right after putting the 10 above the 2)
+            group.sort(key=lambda x: x[1])  # x position
+
+            number = int("".join(str(d[0]) for d in group))
+            result.append(number)
 
         extractingArray.append(result)
     return extractingArray
@@ -320,8 +327,6 @@ def placeTiles(row_amount, board_coords, game_board):
                     tile_length / 2), board_coords[1] + ((id_i + 1) * tile_length) - (tile_length / 2))
 
 
-
-
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
 # The next functions will help in later functions
 # Note: I started writing these late in the code, so some functions won't use them even when it would've been better
@@ -331,24 +336,59 @@ def placeTiles(row_amount, board_coords, game_board):
 def getSpaces(current_board_line):
     # Variable that will get returned
     spaces = []
-    
+
     # Separate the spaces
     space = []
     for i in current_board_line:
         # Put the current space in the spaces list when and F is found, but keep appending to the current space otherwise
         if i == 'F' and len(space) > 0:
             spaces.append(space[:])
-            space.clear
+            space.clear()
         else:
             space.append(i)
-            
+
     # Put the last space in the list if any is left to be put
     if len(space) > 0:
         spaces.append(space[:])
-        
+
     # Return the list
     return spaces
+
+
+# This function returns the minimal amount of tiles that it takes to complete a line (e.g. for [3, 1, 1, 1, 1] it returns 11)
+def getMinTiles(current_line):
+    tiles_sum = 0
+
+    # Add the T tiles
+    for i in current_line:
+        tiles_sum += i
+
+    # Add one F tile in between
+    tiles_sum += len(current_line) - 1
+
+    # Return the number
+    return tiles_sum
+
+
+# This function puts spaces (from the getSpaces function) back into the board line
+def putSpacesBack(spaces, current_board_line):
+    # Board that will get returned
+    working_board = []
+    
+    # Make a one-dimensional list of spaces
+    clean_spaces = []
+    for i in spaces:
+        clean_spaces.extend(i)
+        
+    for i in current_board_line:
+        if i == 'F':
+            working_board.append('F')
+        else:
+            working_board.append(clean_spaces[0])
+            clean_spaces.pop(0)
             
+    return working_board
+
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
 # The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, "F" to a tile that has to be unchecked and 0 to a tile that has yet to be marked)
@@ -1472,6 +1512,32 @@ def crossBeginning(current_line, current_board_line):
     return working_board
 
 
+# Function that considers that when there's two spaces and the whole thing doesn't fit in one, then the first number is in the first space and the last number is in the last space (e.g. for [3, 1, 1, 1, 1] and 00000F00T000000, the 3 goes in the first space and returns 00T00F00T000000)
+def separateSpaces(current_line, current_board_line):
+    # Get the variables
+    spaces = getSpaces(current_board_line)
+    min_tiles_sum = getMinTiles(current_line)
+
+    # Largest space's length
+    max_space_len = len(max(spaces, key=len))
+
+    # Only proceed if there's two spaces and not everything can fit in one space
+    if len(spaces) != 2 or min_tiles_sum < max_space_len:
+        return current_board_line
+
+    # Fill the spaces
+    spaces[0] = fillOverlapping(current_line[0:1], spaces[0])
+    spaces[1] = fillOverlapping(current_line[-1:], spaces[1])
+
+    spaces[0] = surroundBlocks(current_line[0:-1], spaces[0])
+    spaces[1] = surroundBlocks(current_line[1:], spaces[1])
+
+    # Board that will get returned
+    working_board = putSpacesBack(spaces, current_board_line)
+
+    return current_board_line
+
+
 # Function that removes the largest number if it's already done, and repeats the function
 # Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
@@ -1590,6 +1656,7 @@ def removeLargest(current_line, current_board_line):
     working_array = removeImpossible(working_line, working_array)
     working_array = multiOverlap(working_line, working_array)
     working_array = crossBeginning(working_line, working_array)
+    working_array = separateSpaces(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
