@@ -320,8 +320,38 @@ def placeTiles(row_amount, board_coords, game_board):
                     tile_length / 2), board_coords[1] + ((id_i + 1) * tile_length) - (tile_length / 2))
 
 
+
+
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
-# The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, and "F" to a tile that has to be unchecked)
+# The next functions will help in later functions
+# Note: I started writing these late in the code, so some functions won't use them even when it would've been better
+# -------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# This function returns the amount of spaces (e.g. the places that can contain a part of a line, separated by one or more F's)
+def getSpaces(current_board_line):
+    # Variable that will get returned
+    spaces = []
+    
+    # Separate the spaces
+    space = []
+    for i in current_board_line:
+        # Put the current space in the spaces list when and F is found, but keep appending to the current space otherwise
+        if i == 'F' and len(space) > 0:
+            spaces.append(space[:])
+            space.clear
+        else:
+            space.append(i)
+            
+    # Put the last space in the list if any is left to be put
+    if len(space) > 0:
+        spaces.append(space[:])
+        
+    # Return the list
+    return spaces
+            
+
+# -------------------------------------------------------------------------------------------------------------------------------------------------------
+# The next functions will be to solve the puzzle (In the arrays, "T" refers to a tile that has to be checked, "F" to a tile that has to be unchecked and 0 to a tile that has yet to be marked)
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Function that extracts a column from the board
