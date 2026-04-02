@@ -42,56 +42,59 @@ columns_height = max(map(len, column_digits))
 row_width = max(map(len, row_digits))
 
 # Length of the whole board
-board_width = 350
+board_width = 450
 # Length of the tiles' side
 tile_width = board_width/row_amount
 # Shift from the top left corner
 grid_shift = 20
 
+# Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
+is_pygame_used = False
 
-# Setup for text displaying
-pygame.font.init()
-font = pygame.font.SysFont("Arial", int(tile_width))
+if is_pygame_used:
+    # Setup for text displaying
+    pygame.font.init()
+    font = pygame.font.SysFont("Arial", int(tile_width))
 
-# Display the board in a pygame window (for testing)
-pygame.init
-screen = pygame.display.set_mode((640, 640))
-screen.fill((42, 43, 35))
+    # Display the board in a pygame window (for testing)
+    pygame.init
+    screen = pygame.display.set_mode((640, 640))
+    screen.fill((42, 43, 35))
 
-# Display the column numbers
-for i in range(len(column_digits)):
-    pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
-        grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
-    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
-                                                    grid_shift, tile_width, tile_width*columns_height), 3)
-    for j in range(len(column_digits[i])):
-        # Set the difference for alignment purposes
-        empty_tiles = (columns_height-len(column_digits[i])) * tile_width
+    # Display the column numbers
+    for i in range(len(column_digits)):
+        pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
+            grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
+                                                        grid_shift, tile_width, tile_width*columns_height), 3)
+        for j in range(len(column_digits[i])):
+            # Set the difference for alignment purposes
+            empty_tiles = (columns_height-len(column_digits[i])) * tile_width
 
-        # Display the numbers
-        text_surface = font.render(str(column_digits[i][j]), False, (0, 0, 0))
-        screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
-                    (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
+            # Display the numbers
+            text_surface = font.render(str(column_digits[i][j]), False, (0, 0, 0))
+            screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
+                        (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
 
-# Display the row numbers
-for i in range(len(row_digits)):
-    pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
-        grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
-    pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
-        columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
-    for j in range(len(row_digits[i])):
-        # Set the difference for alignment purposes
-        empty_tiles = (row_width-len(row_digits[i])) * tile_width
+    # Display the row numbers
+    for i in range(len(row_digits)):
+        pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
+            grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
+            columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
+        for j in range(len(row_digits[i])):
+            # Set the difference for alignment purposes
+            empty_tiles = (row_width-len(row_digits[i])) * tile_width
 
-        # Display the numbers
-        text_surface = font.render(str(row_digits[i][j]), False, (0, 0, 0))
-        screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
-                    tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
+            # Display the numbers
+            text_surface = font.render(str(row_digits[i][j]), False, (0, 0, 0))
+            screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
+                        tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
 
 
-# Make a rectangle for the board
-pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
-    grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
+    # Make a rectangle for the board
+    pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
+        grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
 
 
 # FIRST PART: only has to be done once
@@ -477,7 +480,7 @@ while previous_board != game_board:
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
-    # Cross beginning if possible
+    # Separate spaces
     for i in range(row_amount):
         # Do columns
         current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
@@ -488,6 +491,20 @@ while previous_board != game_board:
         # Do rows
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.separateSpaces(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+    # Fill spaces that can't have anything
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
@@ -505,33 +522,38 @@ while previous_board != game_board:
             row_digits[i], current_line)
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
+if is_pygame_used:
+    # ------------------------
+    # Draw the tiles in Pygame
+    # ------------------------
 
-# ------------------------
-# Draw the tiles in Pygame
-# ------------------------
-for i in range(row_amount):
-    for j in range(row_amount):
-        if game_board[j][i] == "T":
+    # The higher the number is, the larger the tile length will be displayed
+    tile_length = 7.5
+
+    for i in range(row_amount):
+        for j in range(row_amount):
+            if game_board[j][i] == "T":
+                pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
+                    grid_shift + (tile_width * row_width) + i * tile_width + tile_width / tile_length, grid_shift + (tile_width * columns_height) + j * tile_width + tile_width / tile_length, tile_width - tile_width / (tile_length / 2), tile_width - tile_width / (tile_length / 2)))
+            elif game_board[j][i] == "F":
+                pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(
+                    grid_shift + (tile_width * row_width) + i * tile_width + tile_width / tile_length, grid_shift + (tile_width * columns_height) + j * tile_width + tile_width / tile_length, tile_width - tile_width / (tile_length / 2), tile_width - tile_width / (tile_length / 2)))
             pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
-                grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
-        elif game_board[j][i] == "F":
-            pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(
-                grid_shift + (tile_width*row_width) + i*tile_width + tile_width/10, grid_shift+(tile_width*columns_height) + j*tile_width + tile_width/10, tile_width - tile_width/5, tile_width - tile_width/5))
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
-            grid_shift + (tile_width*row_width) + i*tile_width, grid_shift + (tile_width*columns_height) + j*tile_width, tile_width, tile_width), 3)
+                grid_shift + (tile_width*row_width) + i*tile_width, grid_shift + (tile_width*columns_height) + j*tile_width, tile_width, tile_width), 3)
 
-gameRunning = True
-while gameRunning:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            gameRunning = False
-    pygame.display.update()
+    gameRunning = True
+    while gameRunning:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameRunning = False
+        pygame.display.update()
 
-pygame.quit()
+    pygame.quit()
 
 
 # ---------------------------
 # Place the tiles in the game
 # ---------------------------
 board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
-# nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
+if is_pygame_used == False:
+    nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)

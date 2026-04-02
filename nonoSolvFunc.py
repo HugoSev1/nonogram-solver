@@ -344,7 +344,7 @@ def getSpaces(current_board_line):
         if i == 'F' and len(space) > 0:
             spaces.append(space[:])
             space.clear()
-        else:
+        elif i != 'F':
             space.append(i)
 
     # Put the last space in the list if any is left to be put
@@ -374,19 +374,19 @@ def getMinTiles(current_line):
 def putSpacesBack(spaces, current_board_line):
     # Board that will get returned
     working_board = []
-    
+
     # Make a one-dimensional list of spaces
     clean_spaces = []
     for i in spaces:
         clean_spaces.extend(i)
-        
+
     for i in current_board_line:
         if i == 'F':
             working_board.append('F')
         else:
             working_board.append(clean_spaces[0])
             clean_spaces.pop(0)
-            
+
     return working_board
 
 
@@ -1514,6 +1514,10 @@ def crossBeginning(current_line, current_board_line):
 
 # Function that considers that when there's two spaces and the whole thing doesn't fit in one, then the first number is in the first space and the last number is in the last space (e.g. for [3, 1, 1, 1, 1] and 00000F00T000000, the 3 goes in the first space and returns 00T00F00T000000)
 def separateSpaces(current_line, current_board_line):
+    # Only keep going if the line has at least two numbers
+    if len(current_line) < 2:
+        return current_board_line
+
     # Get the variables
     spaces = getSpaces(current_board_line)
     min_tiles_sum = getMinTiles(current_line)
@@ -1535,7 +1539,59 @@ def separateSpaces(current_line, current_board_line):
     # Board that will get returned
     working_board = putSpacesBack(spaces, current_board_line)
 
-    return current_board_line
+    return working_board
+
+
+# Function that fills spaces where nothing can fit with F's
+def fillImpossibleSpaces(current_line, current_board_line):
+    spaces = getSpaces(current_board_line)
+
+    # Only keep going if there's at least two spaces and the line isn't already done
+    if len(spaces) < 2 or 0 not in current_board_line:
+        return current_board_line
+
+    # Just filling the easy empty spaces
+    for i in spaces:
+        if len(i) < min(current_line):
+            for id_j, j in enumerate(i):
+                i[id_j] = 'F'
+
+    # Do the trickier ones
+    # Index of the first number in current_line that can fit in the smallest space
+    first_fit = 0
+    for id_i, i in enumerate(current_line):
+        if i <= len(min(spaces, key=len)):
+            first_fit = id_i
+            break
+
+    # Line that we'll work with
+    working_line = current_line[:first_fit]
+
+    # Sliced working board
+    sliced_board = []
+
+    # Board until the first smallest space
+    for i in spaces:
+        if i == min(spaces, key=len):
+            break
+        else:
+            sliced_board.extend(i)
+
+    # Smallest beginning
+    min_beginning = getMinTiles(working_line)
+
+    # Fill the first empty space if the beginning can't fit
+    if min_beginning > len(sliced_board):
+        for i in spaces:
+            # Put F's in the space if it has to be F's
+            if i == min(spaces, key=len):
+                for id_j, j in enumerate(i):
+                    i[id_j] = 'F'
+
+    # Board that will get returned
+    final_board = putSpacesBack(spaces, current_board_line)
+
+    return final_board
 
 
 # Function that removes the largest number if it's already done, and repeats the function
@@ -1657,6 +1713,7 @@ def removeLargest(current_line, current_board_line):
     working_array = multiOverlap(working_line, working_array)
     working_array = crossBeginning(working_line, working_array)
     working_array = separateSpaces(working_line, working_array)
+    working_array = fillImpossibleSpaces(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
