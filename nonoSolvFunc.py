@@ -253,7 +253,7 @@ def extractRowNumbers(row_amount):
             best_match = None
             best_score = -1
 
-            for digit in range(1, row_amount):
+            for digit in range(0, row_amount):
                 template = cv2.imread(f"templates\\{digit}.png", 0)
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
@@ -1576,12 +1576,24 @@ def fillImpossibleSpaces(current_line, current_board_line):
             break
         else:
             sliced_board.extend(i)
+            sliced_board.extend('F')
 
-    # Smallest beginning
-    min_beginning = getMinTiles(working_line)
+    # Remove the F at the end
+    if len(sliced_board) > 0:
+        sliced_board = sliced_board[:-1]
+
+    # Count how many numbers can fit
+    fit_counter = 0
 
     # Fill the first empty space if the beginning can't fit
-    if min_beginning > len(sliced_board):
+    for i in working_line:
+        for id_j, j in enumerate(sliced_board):
+            if 'F' not in sliced_board[id_j:id_j + i]:
+                fit_counter += 1
+                for id_k, k in enumerate(sliced_board[:id_j + 1]):
+                    sliced_board[id_k] = 'F'
+
+    if fit_counter < len(working_line):
         for i in spaces:
             # Put F's in the space if it has to be F's
             if i == min(spaces, key=len):
@@ -1590,6 +1602,47 @@ def fillImpossibleSpaces(current_line, current_board_line):
 
     # Board that will get returned
     final_board = putSpacesBack(spaces, current_board_line)
+
+    return final_board
+
+
+# Function that puts an F if everything from before is already filled (e.g. for [1, 3, 1, 1, 3] TFFFTTTFT00FTTT becomes TFFFTTTFTF0FTTT)
+def crossAfterComplete(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = []
+
+    # Index where the F will be put
+    cross_index = 0
+
+    for id_i, i in enumerate(current_board_line):
+        if i == 0:
+            working_board = current_board_line[:id_i]
+            cross_index = id_i
+            break
+
+    # Only keep going if necessary and possible
+    if 0 not in current_board_line or len(working_board) == 0 or working_board[-1] == 'F':
+        return current_board_line
+
+    # Count the spaces in the working board
+    spaces = getSpaces(working_board)
+
+    # List that has the length of each space
+    spaces_length = []
+    for i in spaces:
+        spaces_length.append(len(i))
+
+    # Current line up until now
+    working_line = current_line[:len(spaces)]
+
+    # Put the F in the board that will get returned
+    final_board = current_board_line[:]
+    if spaces_length == working_line:
+        final_board[cross_index] = 'F'
+    
+
+    if current_line == [1, 3, 1, 1, 3]:
+        print(final_board)
 
     return final_board
 
@@ -1714,6 +1767,7 @@ def removeLargest(current_line, current_board_line):
     working_array = crossBeginning(working_line, working_array)
     working_array = separateSpaces(working_line, working_array)
     working_array = fillImpossibleSpaces(working_line, working_array)
+    working_array = crossAfterComplete(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':

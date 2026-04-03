@@ -1,6 +1,8 @@
 import nonoSolvFunc
 import pygame
 
+# Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
+is_pygame_used = True
 
 # Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()
@@ -48,9 +50,6 @@ tile_width = board_width/row_amount
 # Shift from the top left corner
 grid_shift = 20
 
-# Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
-is_pygame_used = False
-
 if is_pygame_used:
     # Setup for text displaying
     pygame.font.init()
@@ -72,7 +71,8 @@ if is_pygame_used:
             empty_tiles = (columns_height-len(column_digits[i])) * tile_width
 
             # Display the numbers
-            text_surface = font.render(str(column_digits[i][j]), False, (0, 0, 0))
+            text_surface = font.render(
+                str(column_digits[i][j]), False, (0, 0, 0))
             screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
                         (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
 
@@ -90,7 +90,6 @@ if is_pygame_used:
             text_surface = font.render(str(row_digits[i][j]), False, (0, 0, 0))
             screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
                         tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
-
 
     # Make a rectangle for the board
     pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
@@ -499,13 +498,35 @@ while previous_board != game_board:
         # Do columns
         current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
-            column_digits[i], current_line)
+            column_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+            column_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
 
         # Do rows
         current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
         current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
-            row_digits[i], current_line)
+            row_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+            row_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    #  Put an F after completed tiles
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.crossAfterComplete(
+            column_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.crossAfterComplete(
+            column_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.crossAfterComplete(
+            row_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.crossAfterComplete(
+            row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
     # Do every relative function without considering the largest numbers
