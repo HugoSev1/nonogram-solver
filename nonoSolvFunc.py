@@ -1281,7 +1281,7 @@ def stopAfterLastMax(current_line, current_board_line):
     return working_board
 
 
-# Function that fills the beginning of a line when the first number is done (e.g. with [1, 4], F0F1FTTFFF becomes FFFTFTT000)
+# Function that fills the beginning of a line when the first number is done (e.g. with [1, 4], F0FTFTT000 becomes FFFTFTT000)
 def fillBeforeBeginning(current_line, current_board_line):
     # Board that we'll work with
     working_board = current_board_line[:]
@@ -1526,7 +1526,7 @@ def separateSpaces(current_line, current_board_line):
     max_space_len = len(max(spaces, key=len))
 
     # Only proceed if there's two spaces and not everything can fit in one space
-    if len(spaces) != 2 or min_tiles_sum < max_space_len:
+    if len(spaces) != 2 or min_tiles_sum <= max_space_len:
         return current_board_line
 
     # Fill the spaces
@@ -1639,12 +1639,37 @@ def crossAfterComplete(current_line, current_board_line):
     final_board = current_board_line[:]
     if spaces_length == working_line:
         final_board[cross_index] = 'F'
-    
 
     if current_line == [1, 3, 1, 1, 3]:
         print(final_board)
 
     return final_board
+
+
+# Function that detects when each number goes in each space and completes what it can (e.g. with [4, 3] 00000000TF00TT0 will return...)
+def matchSpaces(current_line, current_board_line):
+    spaces = getSpaces(current_board_line)
+    # Return the original board if the line is completed or if there aren't as many spaces as numbers on the line
+    if 0 not in current_board_line or len(current_line) != len(spaces):
+        return current_board_line
+
+    # Check if there's at least a T in each space, return the original board otherwise
+    for i in spaces:
+        if 'T' not in i:
+            return current_board_line
+
+    # Now complete what we can on the line
+    for id_i, i in enumerate(spaces):
+        spaces[id_i] = joinTiles(current_line[id_i:id_i + 1], spaces[id_i])
+        spaces[id_i] = extendExtremum(
+            current_line[id_i:id_i + 1], spaces[id_i])
+        spaces[id_i] = fillExtremum(current_line[id_i:id_i + 1], spaces[id_i])
+        spaces[id_i] = crossReach(current_line[id_i:id_i + 1], spaces[id_i])
+
+    # Put the spaces in a board that will get returned
+    working_board = putSpacesBack(spaces, current_board_line)
+
+    return working_board
 
 
 # Function that removes the largest number if it's already done, and repeats the function
@@ -1768,6 +1793,7 @@ def removeLargest(current_line, current_board_line):
     working_array = separateSpaces(working_line, working_array)
     working_array = fillImpossibleSpaces(working_line, working_array)
     working_array = crossAfterComplete(working_line, working_array)
+    working_array = matchSpaces(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
