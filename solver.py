@@ -546,6 +546,24 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.matchSpaces(
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Cross tiles between the numbers on a line
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.numberSeparation(
+            column_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.numberSeparation(
+            column_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.numberSeparation(
+            row_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.numberSeparation(
+            row_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
     # Do every relative function without considering the largest numbers
     for i in range(row_amount):

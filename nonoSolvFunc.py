@@ -1672,6 +1672,44 @@ def matchSpaces(current_line, current_board_line):
     return working_board
 
 
+# Function that finds when two numbers can't exist for one or more tiles, then puts an F in those tiles (e.g. for 7, 5 0TTTTTT000TTTT0 becomes 0TTTTTT0F0TTTT0)
+def numberSeparation(current_line, current_board_line):
+    # Make sure that the two lines correspond to both numbers instead of just one that hasn't been completed
+    # For that, we first delimit the extremum of T's
+    first_marked = 0
+    for id_i, i in enumerate(current_board_line):
+        if i == 'T':
+            first_marked = id_i
+            break
+
+    last_marked = 0
+    for id_i, i in enumerate(current_board_line):
+        if 'T' not in current_board_line[id_i:]:
+            last_marked = id_i
+            break
+
+    # Board that we'll work with
+    working_board = current_board_line[first_marked:last_marked]
+
+    # Now, we only proceed if all of that is long enough to not just be parts of only one of the two numbers and if there are exactly two numbres in the current line
+    if len(working_board) <= max(current_line) or len(current_line) != 2:
+        return current_board_line
+
+    # Put the F's where they can be
+    for id_i, i in enumerate(working_board[current_line[0]:len(working_board) - current_line[1]]):
+        working_board[current_line[0] + id_i] = 'F'
+
+    # Board that will get returned
+    final_board = current_board_line[:]
+    for id_i, i in enumerate(final_board[first_marked:last_marked]):
+        final_board[first_marked + id_i] = working_board[id_i]
+
+    if current_line == [7, 5]:
+        print(final_board)
+
+    return final_board
+
+
 # Function that removes the largest number if it's already done, and repeats the function
 # Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
@@ -1794,6 +1832,7 @@ def removeLargest(current_line, current_board_line):
     working_array = fillImpossibleSpaces(working_line, working_array)
     working_array = crossAfterComplete(working_line, working_array)
     working_array = matchSpaces(working_line, working_array)
+    working_array = numberSeparation(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
