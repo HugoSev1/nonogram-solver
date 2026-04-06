@@ -1704,8 +1704,74 @@ def numberSeparation(current_line, current_board_line):
     for id_i, i in enumerate(final_board[first_marked:last_marked]):
         final_board[first_marked + id_i] = working_board[id_i]
 
-    if current_line == [7, 5]:
+    return final_board
+
+
+# Function that finds a part of the line and completes what comes before when possible (e.g. with [1, 1, 2, 3] 0000TT000000000 becomes TFTFTT000000000)
+def completeBefore(current_line, current_board_line):
+    # Only proceed if the line hasn't been completed
+    if 0 not in current_board_line:
+        return current_board_line
+
+    # Find the first marked tiles
+    # First of those tiles
+    first_tile = 0
+    for id_i, i in enumerate(current_board_line):
+        if i == 'T':
+            first_tile = id_i
+            break
+
+    # Stop here if first_tile is the first tile of the line
+    if first_tile == 0:
+        return current_board_line
+
+    # Last of those tiles
+    last_tile = 0
+    for id_i, i in enumerate(current_board_line[first_tile:]):
+        if i != 'T':
+            last_tile = first_tile + id_i
+            break
+        elif id_i == len(current_board_line[first_tile:]) - 1:
+            last_tile = first_tile + id_i + 1
+
+    # List for those tiles
+    first_tiles = current_board_line[first_tile:last_tile]
+
+    # Line until the first marked tiles can appear
+    working_line = []
+
+    # Find he earliest where this can appear
+    for id_i, i in enumerate(current_line[1:]):
+        if i >= len(first_tiles):
+            working_line = current_line[:id_i]
+
+    # Least amount of tiles that the beginning can take
+    beginning_min = sum(working_line) + len(working_line)
+
+    # Beginning of the board that will get updated
+    updated_board = []
+    for i in range(first_tile):
+        updated_board.append(0)
+
+    # If there's just enough place to put the first tiles, place them, otherwise return the original board
+    if first_tile == beginning_min:
+        updated_board[:-1] = relFullLine(working_line, updated_board[:-1])
+    else:
+        return current_board_line
+
+    # Place an F at the end
+    updated_board[-1] = 'F'
+
+    # Board that will get returned
+    final_board = current_board_line[:]
+    final_board[:first_tile] = updated_board
+
+    if current_board_line != final_board:
+        print(current_line)
+        print(working_line)
+        print(current_board_line)
         print(final_board)
+        print("-------------------")
 
     return final_board
 
@@ -1833,6 +1899,7 @@ def removeLargest(current_line, current_board_line):
     working_array = crossAfterComplete(working_line, working_array)
     working_array = matchSpaces(working_line, working_array)
     working_array = numberSeparation(working_line, working_array)
+    working_array = completeBefore(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
