@@ -1640,9 +1640,6 @@ def crossAfterComplete(current_line, current_board_line):
     if spaces_length == working_line:
         final_board[cross_index] = 'F'
 
-    if current_line == [1, 3, 1, 1, 3]:
-        print(final_board)
-
     return final_board
 
 
@@ -1766,12 +1763,43 @@ def completeBefore(current_line, current_board_line):
     final_board = current_board_line[:]
     final_board[:first_tile] = updated_board
 
-    if current_board_line != final_board:
-        print(current_line)
-        print(working_line)
-        print(current_board_line)
-        print(final_board)
-        print("-------------------")
+    return final_board
+
+
+# Function that puts F's at the beginning when the first number can't be there
+def crossBeforeFirst(current_line, current_board_line):
+    # Board that we'll work with
+    working_board = current_board_line[:current_line[0] * 2]
+
+    # Find the index of the first T in the current line
+    first_marked = 0
+
+    for id_i, i in enumerate(working_board):
+        if i == 'T':
+            first_marked = id_i
+            break
+
+    # Find the index of the last T in this segment
+    last_marked = 0
+    for id_i, i in enumerate(working_board[first_marked:]):
+        if i != 'T':
+            last_marked = id_i + first_marked
+            break
+
+    # Only proceed if either isn't 0
+    if first_marked == 0 or last_marked == 0:
+        return current_board_line
+
+    # Last possible index to place an F
+    last_cross = last_marked - current_line[0] - 1
+
+    # Board that will get returned
+    final_board = current_board_line[:]
+
+    # Place the F's
+    while last_cross >= 0:
+        final_board[last_cross] = 'F'
+        last_cross -= 1
 
     return final_board
 
@@ -1900,6 +1928,7 @@ def removeLargest(current_line, current_board_line):
     working_array = matchSpaces(working_line, working_array)
     working_array = numberSeparation(working_line, working_array)
     working_array = completeBefore(working_line, working_array)
+    working_array = crossBeforeFirst(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
