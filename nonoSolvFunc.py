@@ -1334,6 +1334,10 @@ def fillBeforeBeginning(current_line, current_board_line):
 
 # Relative equivalent of doFullLine (e.g. with [4, 1, 1] FTTTTF000F becomes FTTTTFTFTF)
 def relFullLine(current_line, current_board_line):
+    # Only proceed if the line isn't completed
+    if 0 not in current_board_line:
+        return current_board_line
+
     # Board that we'll work with
     working_board = current_board_line[:]
 
@@ -1739,6 +1743,8 @@ def completeBefore(current_line, current_board_line):
 
     # Find he earliest where this can appear
     for id_i, i in enumerate(current_line[1:]):
+        if i < current_line[id_i]:
+            return current_board_line
         if i >= len(first_tiles):
             working_line = current_line[:id_i]
 
@@ -1748,7 +1754,7 @@ def completeBefore(current_line, current_board_line):
     # Beginning of the board that will get updated
     updated_board = []
     for i in range(first_tile):
-        updated_board.append(0)
+        updated_board.append(current_board_line[i])
 
     # If there's just enough place to put the first tiles, place them, otherwise return the original board
     if first_tile == beginning_min:
@@ -1766,8 +1772,12 @@ def completeBefore(current_line, current_board_line):
     return final_board
 
 
-# Function that puts F's at the beginning when the first number can't be there
+# Function that puts F's at the beginning when the first number can't be there (e.g. with [4] 000TT0000 becomes F00TT0000)
 def crossBeforeFirst(current_line, current_board_line):
+    # Only proceed if there's a T in the beginning
+    if 'T' not in current_board_line[:current_line[0]]:
+        return current_board_line
+
     # Board that we'll work with
     working_board = current_board_line[:current_line[0] * 2]
 
