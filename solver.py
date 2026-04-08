@@ -2,7 +2,7 @@ import nonoSolvFunc
 import pygame
 
 # Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
-is_pygame_used = True
+is_pygame_used = False
 
 # Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()

@@ -1359,7 +1359,7 @@ def relFullLine(current_line, current_board_line):
     changed_slice = []
 
     # Only proceed when possible
-    if len(sliced_board) == sum(current_line) + len(current_line) - 1:
+    if len(sliced_board) == sum(current_line) + len(current_line) - 1 and 'T' not in current_board_line:
         for i in range(len(current_line)-1):
             if i % 2 == 0:
                 working_line.insert(i+1, 0)
@@ -1462,7 +1462,7 @@ def multiOverlap(current_line, current_board_line):
             smallest_board.append(1)
         smallest_board.append(0)
 
-    # Remove the last zero
+    # Remove the last 0
     smallest_board.pop(-1)
 
     # Highest amount of times the smallest board can be put in the working board
@@ -1876,6 +1876,10 @@ def placeTwoInSpace(current_line, current_board_line):
 
     # Index of the space that will get updated
     changing_space_index = combination_spaces[0]
+
+    # Make the space full of 0's
+    for id_i, i in enumerate(spaces[changing_space_index]):
+        spaces[id_i] = 0
 
     # Updating the space
     spaces[changing_space_index] = relFullLine(
