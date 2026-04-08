@@ -582,7 +582,7 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.completeBefore(
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-        
+
     # Cross tiles before the first number
     for i in range(row_amount):
         # Do columns
@@ -600,8 +600,8 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.crossBeforeFirst(
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-        
-    # Cross tiles before the first number
+
+    # Complete the first space when possible
     for i in range(row_amount):
         # Do columns
         current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
@@ -616,6 +616,24 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.completeFirstSpace(
             row_digits[i][::-1], current_line[::-1])
         current_complete_array = nonoSolvFunc.completeFirstSpace(
+            row_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+    # Place two numbers in one space
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.placeTwoInSpace(
+            column_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.placeTwoInSpace(
+            column_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.placeTwoInSpace(
+            row_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.placeTwoInSpace(
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
