@@ -2,7 +2,7 @@ import nonoSolvFunc
 import pygame
 
 # Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
-is_pygame_used = False
+is_pygame_used = True
 
 # Getting the coordinates of the blue box around the puzzle
 puzzle_coords = nonoSolvFunc.getPuzzleCoords()
@@ -598,6 +598,24 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.crossBeforeFirst(
             row_digits[i][::-1], current_line[::-1])
         current_complete_array = nonoSolvFunc.crossBeforeFirst(
+            row_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+    # Cross tiles before the first number
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.completeFirstSpace(
+            column_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.completeFirstSpace(
+            column_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.completeFirstSpace(
+            row_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.completeFirstSpace(
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 

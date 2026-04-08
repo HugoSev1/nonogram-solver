@@ -1748,6 +1748,11 @@ def completeBefore(current_line, current_board_line):
         if i >= len(first_tiles):
             working_line = current_line[:id_i]
 
+    # Only proceed if the tiles can't be from the parts from before
+    for i in working_line:
+        if len(first_tiles) <= i:
+            return current_board_line
+
     # Least amount of tiles that the beginning can take
     beginning_min = sum(working_line) + len(working_line)
 
@@ -1768,18 +1773,22 @@ def completeBefore(current_line, current_board_line):
     # Board that will get returned
     final_board = current_board_line[:]
     final_board[:first_tile] = updated_board
-
+    if current_board_line != final_board:
+        print(current_line)
+        print(first_tiles)
+        print(current_board_line)
+        print(final_board)
     return final_board
 
 
 # Function that puts F's at the beginning when the first number can't be there (e.g. with [4] 000TT0000 becomes F00TT0000)
 def crossBeforeFirst(current_line, current_board_line):
     # Only proceed if there's a T in the beginning
-    if 'T' not in current_board_line[:current_line[0]]:
+    if 'T' not in current_board_line[:current_line[0] + 1]:
         return current_board_line
 
     # Board that we'll work with
-    working_board = current_board_line[:current_line[0] * 2]
+    working_board = current_board_line[:current_line[0] * 2 + 1]
 
     # Find the index of the first T in the current line
     first_marked = 0
@@ -1811,6 +1820,31 @@ def crossBeforeFirst(current_line, current_board_line):
         final_board[last_cross] = 'F'
         last_cross -= 1
 
+    return final_board
+
+
+# Function that completes the first space if it contains the same amount of tiles as the first number as well as at least one T (e.g. for [2] if the line starts with F0TF it becomes FTTF)
+def completeFirstSpace(current_line, current_board_line):
+    # Return the original board if it's fully completed
+    if 0 not in current_board_line:
+        return current_board_line
+    
+    spaces = getSpaces(current_board_line)
+    first_space = spaces[0]
+    
+    # Only proceed if the conditions are met
+    if 'T' not in first_space or len(first_space) != current_line[0]:
+        return current_board_line
+    else:
+        for id_i, i in enumerate(first_space):
+            first_space[id_i] = 'T'
+    
+    # Board that will get returned
+    final_board = putSpacesBack(spaces, current_board_line)
+    
+    if current_line == [2, 3, 1]:
+        print(final_board)
+    
     return final_board
 
 
@@ -1939,6 +1973,7 @@ def removeLargest(current_line, current_board_line):
     working_array = numberSeparation(working_line, working_array)
     working_array = completeBefore(working_line, working_array)
     working_array = crossBeforeFirst(working_line, working_array)
+    working_array = completeFirstSpace(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
