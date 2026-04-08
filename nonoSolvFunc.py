@@ -371,7 +371,7 @@ def getMinTiles(current_line):
 
 
 # This function puts spaces (from the getSpaces function) back into the board line
-def putSpacesBack(spaces, current_board_line):
+def putSpacesBack(spaces, board_line):
     # Board that will get returned
     working_board = []
 
@@ -380,7 +380,7 @@ def putSpacesBack(spaces, current_board_line):
     for i in spaces:
         clean_spaces.extend(i)
 
-    for i in current_board_line:
+    for i in board_line:
         if i == 'F':
             working_board.append('F')
         else:
@@ -388,6 +388,39 @@ def putSpacesBack(spaces, current_board_line):
             clean_spaces.pop(0)
 
     return working_board
+
+
+# This function returns a board containing the completed segments (e.g. any amount of T's directly separated by two F's)
+def getCompletedSegments(current_line, board_line):
+    # Board that will get returned
+    segments = []
+
+    # Index of the first T of the current segment
+    first_index = 0
+
+    # Index of the last T of the current segment
+    last_index = 0
+
+    for id_i, i in enumerate(board_line):
+        if i == 'T':
+            if id_i == 0 or board_line[id_i - 1] == 'F':
+                first_index = id_i
+            if id_i + 1 == len(board_line) or board_line[id_i + 1] == 'F':
+                last_index = id_i + 1
+                if 0 not in board_line[first_index:last_index] and 'F' not in board_line[first_index:last_index]:
+                    segments.append(board_line[first_index:last_index])
+
+    return segments
+
+
+# This function is useful for troubleshooting
+def troubleshoot(line, board_line, board):
+    # Print useful information if the board has changed
+    if board_line != board:
+        print(line)
+        print(board_line)
+        print(board)
+        print("-----------------")
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1283,6 +1316,22 @@ def stopAfterLastMax(current_line, current_board_line):
 
 # Function that fills the beginning of a line when the first number is done (e.g. with [1, 4], F0FTFTT000 becomes FFFTFTT000)
 def fillBeforeBeginning(current_line, current_board_line):
+    # Only proceed if we're sure that the first number of the line and the first number of the board correspond
+    segments = getCompletedSegments(current_line, current_board_line)
+
+    # How many times the first number appears in the line
+    line_counter = current_line.count(current_line[0])
+
+    # How many times the first number appears in the board
+    board_counter = 0
+    for i in segments:
+        if len(i) == current_line[0]:
+            board_counter += 1
+
+    # Only proceed if those counters are equal or if line_counter is equal to 1
+    if line_counter != board_counter and line_counter > 1:
+        return current_board_line
+
     # Board that we'll work with
     working_board = current_board_line[:]
 
@@ -1879,7 +1928,7 @@ def placeTwoInSpace(current_line, current_board_line):
 
     # Make the space full of 0's
     for id_i, i in enumerate(spaces[changing_space_index]):
-        spaces[id_i] = 0
+        spaces[changing_space_index][id_i] = 0
 
     # Updating the space
     spaces[changing_space_index] = relFullLine(
