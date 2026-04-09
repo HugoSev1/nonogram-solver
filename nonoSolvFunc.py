@@ -1696,7 +1696,7 @@ def crossAfterComplete(current_line, current_board_line):
     return final_board
 
 
-# Function that detects when each number goes in each space and completes what it can (e.g. with [4, 3] 00000000TF00TT0 will return...)
+# Function that detects when each number goes in each space and completes what it can (e.g. with [4, 3] 00000000TF00TT0 will return 00000TTTTF0TTT0)
 def matchSpaces(current_line, current_board_line):
     spaces = getSpaces(current_board_line)
     # Return the original board if the line is completed or if there aren't as many spaces as numbers on the line
@@ -1940,6 +1940,50 @@ def placeTwoInSpace(current_line, current_board_line):
     return final_board
 
 
+# Function that completes the first number when it's possible and there's an F right after (e.g. with [5, 1] FFFF00000TTF000 becomes FFFF00TTTTTF000)
+def completeFirstBeforeCross(current_line, current_board_line):
+    # Return the original board if it's fully completed
+    if 0 not in current_board_line:
+        return current_board_line
+
+    # Only proceed if the first number is the largest and isn't repeated
+    if current_line[0] != max(current_line) or current_line.count(current_line[0]) > 1:
+        return current_board_line
+
+    # Find the first segment's first tile
+    segment_first = 0
+    for id_i, i in enumerate(current_board_line):
+        if i == 'T':
+            segment_first = id_i
+            break
+
+    # Find the last tile of this segment
+    segment_last = 0
+    for id_i, i in enumerate(current_board_line[segment_first:]):
+        if id_i + 1 == len(current_board_line[segment_first:]) or current_board_line[segment_first:][id_i] != 'T':
+            segment_last = segment_first + id_i
+            break
+
+    # Only proceed if this is larger than the rest of the numbers of this line and it's followed by an F
+    board_segment = current_board_line[segment_first:segment_last]
+
+    if len(current_line) > 1:
+        if len(board_segment) <= max(current_line[1:]):
+            return current_board_line
+
+    if current_board_line[segment_last] != 'F':
+        return current_board_line
+
+    # Board that will get returned
+    final_board = current_board_line[:]
+
+    # Place the T's
+    for id_i, i in enumerate(final_board[segment_last - current_line[0]:segment_last]):
+        final_board[segment_last - id_i - 1] = 'T'
+
+    return final_board
+
+
 # Function that removes the largest number if it's already done, and repeats the function
 # Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
@@ -2067,6 +2111,7 @@ def removeLargest(current_line, current_board_line):
     working_array = crossBeforeFirst(working_line, working_array)
     working_array = completeFirstSpace(working_line, working_array)
     working_array = placeTwoInSpace(working_line, working_array)
+    working_array = completeFirstBeforeCross(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':
