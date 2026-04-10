@@ -1916,8 +1916,12 @@ def placeTwoInSpace(current_line, current_board_line):
     combination_spaces = []
 
     for id_i, i in enumerate(combinations_tiles):
-        if i == len(spaces[id_i]):
-            combination_spaces.append(id_i)
+        for j in spaces:
+            if i > len(j):
+                continue
+            for id_k, k in enumerate(j[:len(j) - i + 1]):
+                if j[combinations[id_i][0] + id_k] == 0:
+                    combination_spaces.append(id_i)
 
     # If exactly one space meets the conditions, proceed. Otherwise, return the original board
     if len(combination_spaces) != 1:
