@@ -333,13 +333,13 @@ def placeTiles(row_amount, board_coords, game_board):
 # -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # This function returns the amount of spaces (e.g. the places that can contain a part of a line, separated by one or more F's)
-def getSpaces(current_board_line):
+def getSpaces(board_line):
     # Variable that will get returned
     spaces = []
 
     # Separate the spaces
     space = []
-    for i in current_board_line:
+    for i in board_line:
         # Put the current space in the spaces list when and F is found, but keep appending to the current space otherwise
         if i == 'F' and len(space) > 0:
             spaces.append(space[:])
@@ -1984,6 +1984,28 @@ def completeFirstBeforeCross(current_line, current_board_line):
     return final_board
 
 
+# Function that checks if the first number can't be in first in the first space because the tile at its index is a T (e.g. )
+def crossFirstOfSpace(current_line, current_board_line):
+    # Return the original board if it's fully completed
+    if 0 not in current_board_line:
+        return current_board_line
+
+    spaces = getSpaces(current_board_line)
+
+    # Only proceed if the first number is large enough
+    if current_line[0] >= len(spaces[0]):
+        return current_board_line
+
+    # If the n-th tile of the first space is a T, begin this space with a F
+    if spaces[0][current_line[0]] == 'T':
+        spaces[0][0] = 'F'
+
+    # Board that will get returned
+    final_board = putSpacesBack(spaces, current_board_line)
+
+    return final_board
+
+
 # Function that removes the largest number if it's already done, and repeats the function
 # Note : it will also remove the first and / or last if they can't be elsewhere
 def removeLargest(current_line, current_board_line):
@@ -2112,6 +2134,7 @@ def removeLargest(current_line, current_board_line):
     working_array = completeFirstSpace(working_line, working_array)
     working_array = placeTwoInSpace(working_line, working_array)
     working_array = completeFirstBeforeCross(working_line, working_array)
+    working_array = crossFirstOfSpace(working_line, working_array)
 
     for i in range(len(current_board_line)):
         if current_board_line[i] == 'T':

@@ -637,7 +637,7 @@ while previous_board != game_board:
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
-    # Place two numbers in one space
+    # Complete the first number of the line when its segment is directly followed by a cross
     for i in range(row_amount):
         # Do columns
         current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
@@ -652,6 +652,24 @@ while previous_board != game_board:
         current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
             row_digits[i][::-1], current_line[::-1])
         current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
+            row_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+    # Check the tile of the same index as the first number of the line
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+            column_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+            column_digits[i], current_complete_array[::-1])
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+            row_digits[i][::-1], current_line[::-1])
+        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
             row_digits[i], current_complete_array[::-1])
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
