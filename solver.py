@@ -146,560 +146,565 @@ for i in range(row_amount):
         nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 # SECOND PART: Repeats until it does nothing
-while previous_board != game_board:
-    for id_i, i in enumerate(game_board):
-        previous_board[id_i] = i.copy()
-    # Complete lines with F's when all black squares on the line are found:
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.doCompleteLine(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.doCompleteLine(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete lines with T's if it's the only possibility with the current board configuration
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete what's possible when a line has only one number and F's (e.g. 3 on a row that is 00TF0 becomes 00TFF)
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-            column_digits[i], current_line)
-        current_complete_array.reverse()
-        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-            column_digits[i], current_complete_array)
-        current_complete_array.reverse()
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-            row_digits[i], current_line)
-        current_complete_array.reverse()
-        current_complete_array = nonoSolvFunc.reduceSingularNumbers(
-            row_digits[i], current_complete_array)
-        current_complete_array.reverse()
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Place tiles that can't fit elsewhere
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.tileCannotFit(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.tileCannotFit(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Check extremums that are done
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.extremumCompletion(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.extremumCompletion(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill the overlapping tiles
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillOverlapping(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillOverlapping(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Check the range when there's only one number
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.checkRange(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.checkRange(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete limited parts of a line
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeLimitedLine(
-            column_digits[i], current_line, row_amount)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeLimitedLine(
-            row_digits[i], current_line, row_amount)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Extend the extremums
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.extendExtremum(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.extendExtremum(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill every space when possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillSpaces(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillSpaces(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Surround blocks
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.surroundBlocks(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.surroundBlocks(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Join tiles by removing gaps
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.joinTiles(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.joinTiles(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Join tiles by removing gaps
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillBeginning(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillBeginning(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Join tiles by removing gaps
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossReach(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossReach(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill singular spaces
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillOneSpace(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillOneSpace(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill extremums when possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillExtremum(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillExtremum(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete the beginning and / or the end when marked tiles have to be here
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeBeginning(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeBeginning(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill the largest part(s) when possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillLargest(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillLargest(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill after last when we can find it
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.stopAfterLastMax(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.stopAfterLastMax(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill before first when possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillBeforeBeginning(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillBeforeBeginning(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Do full line relatively
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.relFullLine(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.relFullLine(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Remove impossible situations and replace what's possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.removeImpossible(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.removeImpossible(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Do overlap over several parts
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.multiOverlap(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.multiOverlap(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Cross beginning if possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossBeginning(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossBeginning(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Separate spaces
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.separateSpaces(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.separateSpaces(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Fill spaces that can't have anything
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Put an F after completed tiles
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossAfterComplete(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.crossAfterComplete(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossAfterComplete(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.crossAfterComplete(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete what we can when spaces match the current line's numbers
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.matchSpaces(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.matchSpaces(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.matchSpaces(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.matchSpaces(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Cross tiles between the numbers on a line
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.numberSeparation(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.numberSeparation(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.numberSeparation(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.numberSeparation(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete the part of a line before the first marked tiles
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeBefore(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.completeBefore(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeBefore(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.completeBefore(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Cross tiles before the first number
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossBeforeFirst(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.crossBeforeFirst(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossBeforeFirst(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.crossBeforeFirst(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete the first space when possible
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeFirstSpace(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.completeFirstSpace(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeFirstSpace(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.completeFirstSpace(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Place two numbers in one space
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.placeTwoInSpace(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.placeTwoInSpace(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.placeTwoInSpace(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.placeTwoInSpace(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Complete the first number of the line when its segment is directly followed by a cross
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Check the tile of the same index as the first number of the line
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
-            column_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
-            column_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
-            row_digits[i][::-1], current_line[::-1])
-        current_complete_array = nonoSolvFunc.crossFirstOfSpace(
-            row_digits[i], current_complete_array[::-1])
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
-
-    # Do every relative function without considering the largest numbers
-    for i in range(row_amount):
-        # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.removeLargest(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
-
-        # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.removeLargest(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+# Note : this is now a function in order to be repeated in the interactive Pygame window
+
+
+def repeatSolve():
+    while previous_board != game_board:
+        for id_i, i in enumerate(game_board):
+            previous_board[id_i] = i.copy()
+        # Complete lines with F's when all black squares on the line are found:
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.doCompleteLine(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.doCompleteLine(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete lines with T's if it's the only possibility with the current board configuration
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.doCompleteBlackSquares(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete what's possible when a line has only one number and F's (e.g. 3 on a row that is 00TF0 becomes 00TFF)
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+                column_digits[i], current_line)
+            current_complete_array.reverse()
+            current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+                column_digits[i], current_complete_array)
+            current_complete_array.reverse()
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+                row_digits[i], current_line)
+            current_complete_array.reverse()
+            current_complete_array = nonoSolvFunc.reduceSingularNumbers(
+                row_digits[i], current_complete_array)
+            current_complete_array.reverse()
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Place tiles that can't fit elsewhere
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.tileCannotFit(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.tileCannotFit(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Check extremums that are done
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.extremumCompletion(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.extremumCompletion(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill the overlapping tiles
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillOverlapping(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillOverlapping(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Check the range when there's only one number
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.checkRange(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.checkRange(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete limited parts of a line
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeLimitedLine(
+                column_digits[i], current_line, row_amount)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeLimitedLine(
+                row_digits[i], current_line, row_amount)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Extend the extremums
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.extendExtremum(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.extendExtremum(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill every space when possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillSpaces(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillSpaces(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Surround blocks
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.surroundBlocks(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.surroundBlocks(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Join tiles by removing gaps
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.joinTiles(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.joinTiles(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Join tiles by removing gaps
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillBeginning(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillBeginning(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Join tiles by removing gaps
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossReach(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossReach(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill singular spaces
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillOneSpace(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillOneSpace(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill extremums when possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillExtremum(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillExtremum(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete the beginning and / or the end when marked tiles have to be here
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeBeginning(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeBeginning(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill the largest part(s) when possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillLargest(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillLargest(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill after last when we can find it
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.stopAfterLastMax(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.stopAfterLastMax(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill before first when possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillBeforeBeginning(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillBeforeBeginning(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Do full line relatively
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.relFullLine(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.relFullLine(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Remove impossible situations and replace what's possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.removeImpossible(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.removeImpossible(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Do overlap over several parts
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.multiOverlap(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.multiOverlap(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Cross beginning if possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossBeginning(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossBeginning(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Separate spaces
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.separateSpaces(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.separateSpaces(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Fill spaces that can't have anything
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.fillImpossibleSpaces(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Put an F after completed tiles
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossAfterComplete(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.crossAfterComplete(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossAfterComplete(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.crossAfterComplete(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete what we can when spaces match the current line's numbers
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.matchSpaces(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.matchSpaces(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.matchSpaces(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.matchSpaces(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Cross tiles between the numbers on a line
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.numberSeparation(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.numberSeparation(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.numberSeparation(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.numberSeparation(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete the part of a line before the first marked tiles
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeBefore(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.completeBefore(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeBefore(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.completeBefore(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Cross tiles before the first number
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossBeforeFirst(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.crossBeforeFirst(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossBeforeFirst(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.crossBeforeFirst(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete the first space when possible
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeFirstSpace(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.completeFirstSpace(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeFirstSpace(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.completeFirstSpace(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Place two numbers in one space
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.placeTwoInSpace(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.placeTwoInSpace(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.placeTwoInSpace(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.placeTwoInSpace(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Complete the first number of the line when its segment is directly followed by a cross
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.completeFirstBeforeCross(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Check the tile of the same index as the first number of the line
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+                column_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.crossFirstOfSpace(
+                row_digits[i], current_complete_array[::-1])
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
+        # Do every relative function without considering the largest numbers
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.removeLargest(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.removeLargest(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
 
 if is_pygame_used:
     # ------------------------
@@ -723,6 +728,12 @@ if is_pygame_used:
     gameRunning = True
     while gameRunning:
         for event in pygame.event.get():
+            # Detect left click
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                # Clicked tile
+                clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
+                                int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount))]
+                print(clicked_tile)
             if event.type == pygame.QUIT:
                 gameRunning = False
         pygame.display.update()
