@@ -168,7 +168,9 @@ def extractColumnNumbers(row_amount):
             best_score = -1
 
             for digit in range(0, row_amount):
-                template = cv2.imread(f"templates\\{digit}.png", 0)
+                template = cv2.imread(f"templates\\{digit % 10}.png", 0)
+                if template is None:
+                    continue
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
                 template = cv2.resize(template, (50, 50))
@@ -254,7 +256,9 @@ def extractRowNumbers(row_amount):
             best_score = -1
 
             for digit in range(0, row_amount):
-                template = cv2.imread(f"templates\\{digit}.png", 0)
+                template = cv2.imread(f"templates\\{digit % 10}.png", 0)
+                if template is None:
+                    continue
                 _, template = cv2.threshold(
                     template, 150, 255, cv2.THRESH_BINARY_INV)
                 template = cv2.resize(template, (50, 50))
@@ -413,6 +417,22 @@ def getCompletedSegments(current_line, board_line):
     return segments
 
 
+# This function returns the smallest possible board for a line (e.g. for [1, 2] returns TFTT)
+def getSmallestBoard(line):
+    # Board that will get returned
+    board = []
+    for i in line:
+        for j in range(i):
+            board.append('T')
+        board.append('F')
+
+    # Remove the F at the end
+    if len(board) > 0:
+        board = board[:-1]
+
+    return board
+
+
 # This function is useful for troubleshooting
 def troubleshoot(line, board_line, board):
     # Print useful information if the board has changed
@@ -548,6 +568,39 @@ def doExtremumConfirm(working_array, number):
         else:
             final_array.append(0)
     return final_array
+
+
+# Function that places all confirmed tiles (improved version of the above function)
+def doConfirmedTiles(current_line, current_board_line):
+    # Board of the current line's length full of 0's
+    working_board = []
+    for i in current_board_line:
+        working_board.append(0)
+
+    # Smallest board of line
+    smallest_board = getSmallestBoard(current_line)
+
+    # Amount of times that the loop will be done
+    looping_amount = len(working_board) - getMinTiles(current_line) + 1
+
+    # Put the numbers
+    for i in range(looping_amount):
+        for id_j, j in enumerate(smallest_board):
+            # Only update when there's a T
+            if j == 'T':
+                working_board[i + id_j] += 1
+
+    # Board that will get returned
+    final_board = []
+
+    # Place the T's and 0's
+    for id_i, i in enumerate(working_board):
+        if i == looping_amount:
+            final_board.append('T')
+        else:
+            final_board.append(current_board_line[id_i])
+
+    return final_board
 
 
 # Function that completes with F's when the full black squares are found
@@ -1988,7 +2041,7 @@ def completeFirstBeforeCross(current_line, current_board_line):
     return final_board
 
 
-# Function that checks if the first number can't be in first in the first space because the tile at its index is a T (e.g. )
+# Function that checks if the first number can't be in first in the first space because the tile at its index is a T (e.g. with [3, N, ...], 000T0000... becomes F00T0000...)
 def crossFirstOfSpace(current_line, current_board_line):
     # Return the original board if it's fully completed
     if 0 not in current_board_line:

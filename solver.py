@@ -131,6 +131,20 @@ for i in range(row_amount):
             current_working_area, row_digits[line_index][number_index])
         nonoSolvFunc.fillRow(extremum_array, game_board, line_index)
 
+# Complete lines with T's if it's the only possibility with the current board configuration
+    for i in range(row_amount):
+        # Do columns
+        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.doConfirmedTiles(
+            column_digits[i], current_line)
+        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+        # Do rows
+        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+        current_complete_array = nonoSolvFunc.doConfirmedTiles(
+            row_digits[i], current_line)
+        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+
 # SECOND PART: Repeats until it does nothing
 while previous_board != game_board:
     for id_i, i in enumerate(game_board):
