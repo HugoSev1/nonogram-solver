@@ -4,146 +4,153 @@ import pygame
 # Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
 is_pygame_used = True
 
-# Getting the coordinates of the blue box around the puzzle
-puzzle_coords = nonoSolvFunc.getPuzzleCoords()
+try:
+    # Getting the coordinates of the blue box around the puzzle
+    puzzle_coords = nonoSolvFunc.getPuzzleCoords()
 
-# Get the columns digits from here
-column_coords = nonoSolvFunc.getColumnImage(puzzle_coords)
-row_amount = nonoSolvFunc.findRowAmount(column_coords)
+    # Get the columns digits from here
+    column_coords = nonoSolvFunc.getColumnImage(puzzle_coords)
+    row_amount = nonoSolvFunc.findRowAmount(column_coords)
 
-# How many rows there are
-column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
+    # How many rows there are
+    column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
 
-# Read the digits from the columns
-row_coords = nonoSolvFunc.getRowImage(puzzle_coords)
-row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
+    # Read the digits from the columns
+    row_coords = nonoSolvFunc.getRowImage(puzzle_coords)
+    row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
 
-# Make a two-dimensional array to store the game board
-game_board = []
-for id_i, i in enumerate(column_digits):
-    game_board.append([])
-    for j in row_digits:
-        game_board[id_i].append(0)
+    # Make a two-dimensional array to store the game board
+    game_board = []
+    for id_i, i in enumerate(column_digits):
+        game_board.append([])
+        for j in row_digits:
+            game_board[id_i].append(0)
 
-# Copy the board (Will be useful later)
-previous_board = []
-for id_i, i in enumerate(column_digits):
-    previous_board.append([])
-    for j in row_digits:
-        previous_board[id_i].append(0)
+    # Copy the board (Will be useful later)
+    previous_board = []
+    for id_i, i in enumerate(column_digits):
+        previous_board.append([])
+        for j in row_digits:
+            previous_board[id_i].append(0)
 
-# Make a similar array to store the working area
-working_area_board = []
-for id_i, i in enumerate(column_digits):
-    working_area_board.append([])
-    for j in row_digits:
-        working_area_board[id_i].append(0)
+    # Make a similar array to store the working area
+    working_area_board = []
+    for id_i, i in enumerate(column_digits):
+        working_area_board.append([])
+        for j in row_digits:
+            working_area_board[id_i].append(0)
 
-# For the pygame display
-columns_height = max(map(len, column_digits))
-row_width = max(map(len, row_digits))
+    # For the pygame display
+    columns_height = max(map(len, column_digits))
+    row_width = max(map(len, row_digits))
 
-# Length of the whole board
-board_width = 450
-# Length of the tiles' side
-tile_width = board_width/row_amount
-# Shift from the top left corner
-grid_shift = 20
+    # Length of the whole board
+    board_width = 450
+    # Length of the tiles' side
+    tile_width = board_width/row_amount
+    # Shift from the top left corner
+    grid_shift = 20
 
-if is_pygame_used:
-    # Setup for text displaying
-    pygame.font.init()
-    font = pygame.font.SysFont("Arial", int(tile_width))
+    if is_pygame_used:
+        # Setup for text displaying
+        pygame.font.init()
+        font = pygame.font.SysFont("Arial", int(tile_width))
 
-    # Display the board in a pygame window (for testing)
-    pygame.init
-    screen = pygame.display.set_mode((640, 640))
-    screen.fill((42, 43, 35))
+        # Display the board in a pygame window (for testing)
+        pygame.init
+        screen = pygame.display.set_mode((640, 640))
+        screen.fill((42, 43, 35))
 
-    # Display the column numbers
-    for i in range(len(column_digits)):
-        pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
-            grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
-                                                        grid_shift, tile_width, tile_width*columns_height), 3)
-        for j in range(len(column_digits[i])):
-            # Set the difference for alignment purposes
-            empty_tiles = (columns_height-len(column_digits[i])) * tile_width
+        # Display the column numbers
+        for i in range(len(column_digits)):
+            pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
+                grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
+                                                            grid_shift, tile_width, tile_width*columns_height), 3)
+            for j in range(len(column_digits[i])):
+                # Set the difference for alignment purposes
+                empty_tiles = (
+                    columns_height-len(column_digits[i])) * tile_width
 
-            # Display the numbers
-            text_surface = font.render(
-                str(column_digits[i][j]), False, (0, 0, 0))
-            screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
-                        (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
+                # Display the numbers
+                text_surface = font.render(
+                    str(column_digits[i][j]), False, (0, 0, 0))
+                screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
+                            (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
 
-    # Display the row numbers
-    for i in range(len(row_digits)):
-        pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
-            grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
-        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
-            columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
-        for j in range(len(row_digits[i])):
-            # Set the difference for alignment purposes
-            empty_tiles = (row_width-len(row_digits[i])) * tile_width
+        # Display the row numbers
+        for i in range(len(row_digits)):
+            pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
+                grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
+                columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
+            for j in range(len(row_digits[i])):
+                # Set the difference for alignment purposes
+                empty_tiles = (row_width-len(row_digits[i])) * tile_width
 
-            # Display the numbers
-            text_surface = font.render(str(row_digits[i][j]), False, (0, 0, 0))
-            screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
-                        tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
+                # Display the numbers
+                text_surface = font.render(
+                    str(row_digits[i][j]), False, (0, 0, 0))
+                screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
+                            tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
 
-    # Make a rectangle for the board
-    pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
-        grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
+        # Make a rectangle for the board
+        pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
+            grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
+except:
+    print("An error occured while initializing.")
 
 
 # FIRST PART: only has to be done once
 # Do the lines that have only one possibility
-for i in range(row_amount):
-    current_line = nonoSolvFunc.doFullLine(row_amount, column_digits[i], [])
-    nonoSolvFunc.fillColumn(current_line, game_board, i)
-    current_line = nonoSolvFunc.doFullLine(row_amount, row_digits[i], [])
-    nonoSolvFunc.fillRow(current_line, game_board, i)
-
-# Do the remaining confirmed tiles (by the extremums)
-for i in range(row_amount):
-    line_index = i
-    # Do columns
-    for id_j, j in enumerate(column_digits[i]):
-        number_index = id_j
-        current_working_area = (nonoSolvFunc.limitLineArea(
-            column_digits[line_index], number_index, row_amount))
-        nonoSolvFunc.limitColumnArea(
-            working_area_board, current_working_area, line_index)
-
-        extremum_array = nonoSolvFunc.doExtremumConfirm(
-            current_working_area, column_digits[line_index][number_index])
-        nonoSolvFunc.fillColumn(extremum_array, game_board, line_index)
-
-    # Do rows
-    for id_j, j in enumerate(row_digits[i]):
-        number_index = id_j
-        current_working_area = (nonoSolvFunc.limitLineArea(
-            row_digits[line_index], number_index, row_amount))
-        nonoSolvFunc.limitRowArea(
-            working_area_board, current_working_area, line_index)
-
-        extremum_array = nonoSolvFunc.doExtremumConfirm(
-            current_working_area, row_digits[line_index][number_index])
-        nonoSolvFunc.fillRow(extremum_array, game_board, line_index)
-
-# Complete lines with T's if it's the only possibility with the current board configuration
+def beginSolve():
     for i in range(row_amount):
+        current_line = nonoSolvFunc.doFullLine(
+            row_amount, column_digits[i], [])
+        nonoSolvFunc.fillColumn(current_line, game_board, i)
+        current_line = nonoSolvFunc.doFullLine(row_amount, row_digits[i], [])
+        nonoSolvFunc.fillRow(current_line, game_board, i)
+
+    # Do the remaining confirmed tiles (by the extremums)
+    for i in range(row_amount):
+        line_index = i
         # Do columns
-        current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.doConfirmedTiles(
-            column_digits[i], current_line)
-        nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+        for id_j, j in enumerate(column_digits[i]):
+            number_index = id_j
+            current_working_area = (nonoSolvFunc.limitLineArea(
+                column_digits[line_index], number_index, row_amount))
+            nonoSolvFunc.limitColumnArea(
+                working_area_board, current_working_area, line_index)
+
+            extremum_array = nonoSolvFunc.doExtremumConfirm(
+                current_working_area, column_digits[line_index][number_index])
+            nonoSolvFunc.fillColumn(extremum_array, game_board, line_index)
 
         # Do rows
-        current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
-        current_complete_array = nonoSolvFunc.doConfirmedTiles(
-            row_digits[i], current_line)
-        nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        for id_j, j in enumerate(row_digits[i]):
+            number_index = id_j
+            current_working_area = (nonoSolvFunc.limitLineArea(
+                row_digits[line_index], number_index, row_amount))
+            nonoSolvFunc.limitRowArea(
+                working_area_board, current_working_area, line_index)
+
+            extremum_array = nonoSolvFunc.doExtremumConfirm(
+                current_working_area, row_digits[line_index][number_index])
+            nonoSolvFunc.fillRow(extremum_array, game_board, line_index)
+
+    # Complete lines with T's if it's the only possibility with the current board configuration
+        for i in range(row_amount):
+            # Do columns
+            current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.doConfirmedTiles(
+                column_digits[i], current_line)
+            nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
+
+            # Do rows
+            current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
+            current_complete_array = nonoSolvFunc.doConfirmedTiles(
+                row_digits[i], current_line)
+            nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 # SECOND PART: Repeats until it does nothing
 # Note : this is now a function in order to be repeated in the interactive Pygame window
@@ -706,14 +713,8 @@ def repeatSolve():
             nonoSolvFunc.fillRow(current_complete_array, game_board, i)
 
 
-if is_pygame_used:
-    # ------------------------
-    # Draw the tiles in Pygame
-    # ------------------------
-
-    # The higher the number is, the larger the tile length will be displayed
-    tile_length = 7.5
-
+# Update Pygame visually
+def updatePygame():
     for i in range(row_amount):
         for j in range(row_amount):
             if game_board[j][i] == "T":
@@ -722,28 +723,86 @@ if is_pygame_used:
             elif game_board[j][i] == "F":
                 pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(
                     grid_shift + (tile_width * row_width) + i * tile_width + tile_width / tile_length, grid_shift + (tile_width * columns_height) + j * tile_width + tile_width / tile_length, tile_width - tile_width / (tile_length / 2), tile_width - tile_width / (tile_length / 2)))
+            elif game_board[j][i] == 0:
+                pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
+                    grid_shift + (tile_width * row_width) + i * tile_width + tile_width / tile_length, grid_shift + (tile_width * columns_height) + j * tile_width + tile_width / tile_length, tile_width - tile_width / (tile_length / 2), tile_width - tile_width / (tile_length / 2)))
             pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(
-                grid_shift + (tile_width*row_width) + i*tile_width, grid_shift + (tile_width*columns_height) + j*tile_width, tile_width, tile_width), 3)
+                grid_shift + (tile_width * row_width) + i * tile_width, grid_shift + (tile_width * columns_height) + j * tile_width, tile_width, tile_width), 3)
+
+
+# Place the tiles in-game in the browser
+def placeIngame():
+    board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
+    nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
+
+print(row_digits)
+print(column_digits)
+# Do the first repeat by default
+beginSolve()
+repeatSolve()
+
+if is_pygame_used:
+    # ------------------------
+    # Draw the tiles in Pygame
+    # ------------------------
+
+    # The higher the number is, the larger the tile length will be displayed
+    tile_length = 7.5
 
     gameRunning = True
     while gameRunning:
+        updatePygame()
         for event in pygame.event.get():
             # Detect left click
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                # Clicked tile
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Tile that has been clicked
                 clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
                                 int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount))]
-                print(clicked_tile)
+
+                # State of this tile (0 by default, T for a black square, or F for a red square that corresponds to a cross in-game in the browser)
+                tile_state = game_board[clicked_tile[1]][clicked_tile[0]]
+
+                # Only update the board when the clicked position is in the board
+                if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
+                    # Left click on a black tile
+                    if tile_state == 'T' and event.button == 1:
+                        game_board[clicked_tile[1]][clicked_tile[0]] = 0
+                    # Left click on a non-black tile
+                    if tile_state != 'T' and event.button == 1:
+                        game_board[clicked_tile[1]][clicked_tile[0]] = 'T'
+                    # Right click on a red tile
+                    if tile_state == 'F' and event.button == 3:
+                        game_board[clicked_tile[1]][clicked_tile[0]] = 0
+                    # Left click on a non-red tile
+                    if tile_state != 'F' and event.button == 3:
+                        game_board[clicked_tile[1]][clicked_tile[0]] = 'F'
+
+            # Do all the functions when R is pressed
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                try:
+                    repeatSolve()
+                # If an error occured, restart the game
+                except:
+                    print("An error occured. The game will restart.")
+                    for id_i, i in enumerate(game_board):
+                        for id_j, j in enumerate(i):
+                            game_board[id_i][id_j] = 0
+                    beginSolve()
+                    repeatSolve()
+
+            # Place in-game in the browser when P is pressed
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                placeIngame()
+
             if event.type == pygame.QUIT:
                 gameRunning = False
         pygame.display.update()
-
     pygame.quit()
 
 
 # ---------------------------
 # Place the tiles in the game
 # ---------------------------
-board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
 if is_pygame_used == False:
+    board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
     nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)

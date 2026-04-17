@@ -1,6 +1,8 @@
 import pyautogui
 from PIL import ImageGrab
 import cv2
+import numpy as np
+
 pyautogui.PAUSE = 0.001
 
 # Display an image (for debugging purposes)
@@ -127,7 +129,7 @@ def findRowAmount(coords):
 
 
 # Best score (for recognition accuracy)
-extraction_best_score = 0.7
+extraction_best_score = 0.5
 
 
 # Function that extracts the numbers shown on the Nonogram
@@ -155,7 +157,14 @@ def extractColumnNumbers(row_amount):
 
         # Detect digits
         gray = cv2.cvtColor(chunk, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+        thresh = cv2.adaptiveThreshold(
+            gray, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY_INV,
+            11, 2
+        )
+        kernel = np.ones((2, 2), np.uint8)
+        thresh = cv2.erode(thresh, kernel, iterations=1)
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = []
@@ -167,8 +176,8 @@ def extractColumnNumbers(row_amount):
             best_match = None
             best_score = -1
 
-            for digit in range(0, row_amount):
-                template = cv2.imread(f"templates\\{digit % 10}.png", 0)
+            for digit in range(10):
+                template = cv2.imread(f"templates\\{digit}.png", 0)
                 if template is None:
                     continue
                 _, template = cv2.threshold(
@@ -243,7 +252,14 @@ def extractRowNumbers(row_amount):
 
         # Detect digits
         gray = cv2.cvtColor(chunk, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY_INV)
+        thresh = cv2.adaptiveThreshold(
+            gray, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY_INV,
+            11, 2
+        )
+        kernel = np.ones((2, 2), np.uint8)
+        thresh = cv2.erode(thresh, kernel, iterations=1)
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = []
@@ -255,8 +271,8 @@ def extractRowNumbers(row_amount):
             best_match = None
             best_score = -1
 
-            for digit in range(0, row_amount):
-                template = cv2.imread(f"templates\\{digit % 10}.png", 0)
+            for digit in range(0, 10):
+                template = cv2.imread(f"templates\\{digit}.png", 0)
                 if template is None:
                     continue
                 _, template = cv2.threshold(
