@@ -4,6 +4,51 @@ import pygame
 # Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
 is_pygame_used = True
 
+# Do a double-check on the lines in case the character detection goes wrong
+double_check_line = False
+
+# Place the lines in Pygame
+
+
+def setPygame():
+    # Display the column numbers
+    for i in range(len(column_digits)):
+        pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
+            grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
+                                                        grid_shift, tile_width, tile_width*columns_height), 3)
+        for j in range(len(column_digits[i])):
+            # Set the difference for alignment purposes
+            empty_tiles = (
+                columns_height-len(column_digits[i])) * tile_width
+
+            # Display the numbers
+            text_surface = font.render(
+                str(column_digits[i][j]), False, (0, 0, 0))
+            screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
+                        (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
+
+    # Display the row numbers
+    for i in range(len(row_digits)):
+        pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
+            grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
+            columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
+        for j in range(len(row_digits[i])):
+            # Set the difference for alignment purposes
+            empty_tiles = (row_width-len(row_digits[i])) * tile_width
+
+            # Display the numbers
+            text_surface = font.render(
+                str(row_digits[i][j]), False, (0, 0, 0))
+            screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
+                        tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
+
+    # Make a rectangle for the board
+    pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
+        grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
+
+
 try:
     # Getting the coordinates of the blue box around the puzzle
     puzzle_coords = nonoSolvFunc.getPuzzleCoords()
@@ -60,43 +105,7 @@ try:
         pygame.init
         screen = pygame.display.set_mode((640, 640))
         screen.fill((42, 43, 35))
-
-        # Display the column numbers
-        for i in range(len(column_digits)):
-            pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
-                grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
-            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
-                                                            grid_shift, tile_width, tile_width*columns_height), 3)
-            for j in range(len(column_digits[i])):
-                # Set the difference for alignment purposes
-                empty_tiles = (
-                    columns_height-len(column_digits[i])) * tile_width
-
-                # Display the numbers
-                text_surface = font.render(
-                    str(column_digits[i][j]), False, (0, 0, 0))
-                screen.blit(text_surface, (grid_shift+(row_width*tile_width) +
-                            (i*tile_width) + tile_width/10, grid_shift+empty_tiles+(j*tile_width)))
-
-        # Display the row numbers
-        for i in range(len(row_digits)):
-            pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
-                grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
-            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
-                columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
-            for j in range(len(row_digits[i])):
-                # Set the difference for alignment purposes
-                empty_tiles = (row_width-len(row_digits[i])) * tile_width
-
-                # Display the numbers
-                text_surface = font.render(
-                    str(row_digits[i][j]), False, (0, 0, 0))
-                screen.blit(text_surface, (grid_shift+empty_tiles+(j*tile_width) +
-                            tile_width/10, grid_shift+(columns_height*tile_width) + (i*tile_width)))
-
-        # Make a rectangle for the board
-        pygame.draw.rect(screen, (248, 236, 194), pygame.Rect(
-            grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
+        setPygame()
 except:
     print("An error occured while initializing.")
 
@@ -735,12 +744,47 @@ def placeIngame():
     board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
     nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
 
-print(row_digits)
-print(column_digits)
-# Do the first repeat by default
-beginSolve()
-repeatSolve()
 
+# Let the user change the board numbers if they are incorrect
+if is_pygame_used and double_check_line:
+    gameRunning = True
+    while gameRunning:
+        for event in pygame.event.get():
+            # Detect left click
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Tile that has been clicked
+                clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
+                                int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
+
+                # Only proceed if we clicked a line (and not the board)
+                # Do rows
+                if clicked_tile[0] >= -row_width and clicked_tile[0] < 0 and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
+                    pass
+                    print(row_digits[clicked_tile[1]])
+                # Do columns
+                if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= -columns_height and clicked_tile[1] < 0:
+                    print(column_digits[clicked_tile[0]])
+
+            if event.type == pygame.QUIT:
+                gameRunning = False
+        pygame.display.update()
+    pygame.quit()
+
+# Do the first repeat by default
+# First functions
+try:
+    beginSolve()
+except:
+    print("An error occured while trying to run the first functions of the solve.")
+
+# Repeating functions
+try:
+    repeatSolve()
+except:
+    print("An error occured while trying to run the repeating functions of the solve.")
+
+
+# Display in Pygame
 if is_pygame_used:
     # ------------------------
     # Draw the tiles in Pygame
@@ -750,6 +794,16 @@ if is_pygame_used:
     tile_length = 7.5
 
     gameRunning = True
+    # Setup for text displaying
+    pygame.font.init()
+    font = pygame.font.SysFont("Arial", int(tile_width))
+
+    # Display the board in a pygame window (for testing)
+    pygame.init
+    screen = pygame.display.set_mode((640, 640))
+    screen.fill((42, 43, 35))
+    setPygame()
+
     while gameRunning:
         updatePygame()
         for event in pygame.event.get():
@@ -757,7 +811,7 @@ if is_pygame_used:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Tile that has been clicked
                 clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
-                                int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount))]
+                                int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
 
                 # State of this tile (0 by default, T for a black square, or F for a red square that corresponds to a cross in-game in the browser)
                 tile_state = game_board[clicked_tile[1]][clicked_tile[0]]

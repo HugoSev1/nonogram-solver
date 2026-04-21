@@ -139,18 +139,13 @@ def extractColumnNumbers(row_amount):
     img = cv2.imread("column-img.png")
     h, w, c, = img.shape
     n_chunks = row_amount
-    chunk_width = w // n_chunks
 
     chunks = []
 
     for i in range(n_chunks):
         # Separate into chunks (e.g. 5 chunks for a 5x5 Nonogram)
-        start_x = i * chunk_width
-
-        if i == n_chunks - 1:
-            end_x = w
-        else:
-            end_x = (i + 1) * chunk_width
+        start_x = int(i * (w / n_chunks))
+        end_x = int((i + 1) * (w / n_chunks))
 
         chunk = img[:, start_x:end_x]
         chunks.append(chunk)
@@ -233,22 +228,16 @@ def extractRowNumbers(row_amount):
     img = cv2.imread("row-img.png")
     h, w, c, = img.shape
     n_chunks = row_amount
-    chunk_height = h // n_chunks
 
     chunks = []
 
     for i in range(n_chunks):
         # Separate into chunks (e.g. 5 chunks for a 5x5 Nonogram)
-        start_y = i * chunk_height
-
-        if i == n_chunks - 1:
-            end_y = h
-        else:
-            end_y = (i + 1) * chunk_height
+        start_y = int(i * (h / n_chunks))
+        end_y = int((i + 1) * (h / n_chunks))
 
         chunk = img[start_y:end_y, :]
         chunks.append(chunk)
-        # showImg(chunk)
 
         # Detect digits
         gray = cv2.cvtColor(chunk, cv2.COLOR_BGR2GRAY)
@@ -1416,6 +1405,15 @@ def fillBeforeBeginning(current_line, current_board_line):
     if len(working_line) > 1:
         # Do forward and backwards
         for n in range(2):
+            # Check the prerequisites again
+            line_counter = working_line.count(working_line[0])
+            board_counter = 0
+            for i in segments:
+                if len(i) == working_line[0]:
+                    board_counter += 1
+            if line_counter != board_counter and line_counter > 1:
+                return current_board_line
+            
             if working_line[0] == working_line[1]:
                 # Clear everything and do backwards
                 working_line.reverse()
@@ -1446,7 +1444,7 @@ def fillBeforeBeginning(current_line, current_board_line):
             working_board.reverse()
             theoretical_board.clear()
             crossed_board.clear()
-
+    troubleshoot(current_line, current_board_line, working_board)
     return working_board
 
 
