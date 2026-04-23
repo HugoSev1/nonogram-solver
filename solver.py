@@ -1,16 +1,32 @@
 import nonoSolvFunc
 import pygame
+import os
 
 # Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
 is_pygame_used = True
 
 # Do a double-check on the lines in case the character detection goes wrong
-double_check_line = False
+double_check_line = True
+
+# Use the files in the save_files folder to load a game if True
+use_save_file = True
+
+# Character to put to end the board when double-checking
+end_char = '/'
+
+# Width of the board in Python (mutable)
+pygame_width = [450]
+
 
 # Place the lines in Pygame
-
-
 def setPygame():
+    screen.fill((42, 43, 35))
+
+    # Update width
+    board_width = pygame_width[0]
+    tile_width = board_width/row_amount
+    font = pygame.font.SysFont("Arial", int(tile_width * 2 / 3))
+
     # Display the column numbers
     for i in range(len(column_digits)):
         pygame.draw.rect(screen, (148, 136, 224), pygame.Rect(
@@ -58,6 +74,8 @@ try:
     row_amount = nonoSolvFunc.findRowAmount(column_coords)
 
     # How many rows there are
+    for i in os.scandir("save_files"):
+        print(i)
     column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
 
     # Read the digits from the columns
@@ -90,7 +108,7 @@ try:
     row_width = max(map(len, row_digits))
 
     # Length of the whole board
-    board_width = 450
+    board_width = pygame_width[0]
     # Length of the tiles' side
     tile_width = board_width/row_amount
     # Shift from the top left corner
@@ -103,7 +121,7 @@ try:
 
         # Display the board in a pygame window (for testing)
         pygame.init
-        screen = pygame.display.set_mode((640, 640))
+        screen = pygame.display.set_mode((1000, 1000))
         screen.fill((42, 43, 35))
         setPygame()
 except:
@@ -724,6 +742,8 @@ def repeatSolve():
 
 # Update Pygame visually
 def updatePygame():
+    board_width = pygame_width[0]
+    tile_width = board_width/row_amount
     for i in range(row_amount):
         for j in range(row_amount):
             if game_board[j][i] == "T":
@@ -739,6 +759,18 @@ def updatePygame():
                 grid_shift + (tile_width * row_width) + i * tile_width, grid_shift + (tile_width * columns_height) + j * tile_width, tile_width, tile_width), 3)
 
 
+# Things that will be working in both Pygame windows (the manual line changer and the game solver)
+def commonPygame(e: pygame.Event, w: list):
+    if e.type == pygame.KEYDOWN:
+        # Zoom in
+        if event.key == pygame.K_KP_PLUS:
+            w[0] += 50
+        # Zoom out
+        elif event.key == pygame.K_KP_MINUS:
+            w[0] -= 50
+        setPygame()
+
+
 # Place the tiles in-game in the browser
 def placeIngame():
     board_coords = nonoSolvFunc.getBoardCoords(column_coords[0], row_coords[1])
@@ -750,6 +782,11 @@ if is_pygame_used and double_check_line:
     gameRunning = True
     while gameRunning:
         for event in pygame.event.get():
+            # Things that are in common for both Pygame windows
+            commonPygame(event, pygame_width)
+            board_width = pygame_width[0]
+            tile_width = board_width/row_amount
+
             # Detect left click
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # Tile that has been clicked
@@ -759,8 +796,15 @@ if is_pygame_used and double_check_line:
                 # Only proceed if we clicked a line (and not the board)
                 # Do rows
                 if clicked_tile[0] >= -row_width and clicked_tile[0] < 0 and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
-                    pass
-                    print(row_digits[clicked_tile[1]])
+                    board = []
+                    value = ''
+                    print(
+                        f"What will be the new value of {row_digits[clicked_tile[1]]}, the #{clicked_tile[1] + 1} row?")
+                    while value != end_char:
+                        value = input(f'Enter an integer:')
+                        if value != end_char:
+                            board.append(int(value))
+                    row_digits[clicked_tile[1]] = board
                 # Do columns
                 if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= -columns_height and clicked_tile[1] < 0:
                     print(column_digits[clicked_tile[0]])
@@ -798,26 +842,32 @@ if is_pygame_used:
     pygame.font.init()
     font = pygame.font.SysFont("Arial", int(tile_width))
 
-    # Display the board in a pygame window (for testing)
+    # Display the board in a pygame window
     pygame.init
-    screen = pygame.display.set_mode((640, 640))
+    screen = pygame.display.set_mode((1000, 1000))
     screen.fill((42, 43, 35))
     setPygame()
 
     while gameRunning:
         updatePygame()
+        board_width = pygame_width[0]
+        tile_width = board_width/row_amount
+
         for event in pygame.event.get():
+            # Things that are in common for both Pygame windows
+            commonPygame(event, pygame_width)
+
             # Detect left click
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Tile that has been clicked
                 clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
                                 int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
 
-                # State of this tile (0 by default, T for a black square, or F for a red square that corresponds to a cross in-game in the browser)
-                tile_state = game_board[clicked_tile[1]][clicked_tile[0]]
-
                 # Only update the board when the clicked position is in the board
                 if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
+                    # State of this tile (0 by default, T for a black square, or F for a red square that corresponds to a cross in-game in the browser)
+                    tile_state = game_board[clicked_tile[1]][clicked_tile[0]]
+
                     # Left click on a black tile
                     if tile_state == 'T' and event.button == 1:
                         game_board[clicked_tile[1]][clicked_tile[0]] = 0

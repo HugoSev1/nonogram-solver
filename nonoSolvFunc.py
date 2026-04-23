@@ -5,9 +5,8 @@ import numpy as np
 
 pyautogui.PAUSE = 0.001
 
+
 # Display an image (for debugging purposes)
-
-
 def showImg(img):
     cv2.imshow("Image", img)
     cv2.waitKey()
@@ -158,8 +157,7 @@ def extractColumnNumbers(row_amount):
             cv2.THRESH_BINARY_INV,
             11, 2
         )
-        kernel = np.ones((2, 2), np.uint8)
-        thresh = cv2.erode(thresh, kernel, iterations=1)
+
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = []
@@ -247,8 +245,7 @@ def extractRowNumbers(row_amount):
             cv2.THRESH_BINARY_INV,
             11, 2
         )
-        kernel = np.ones((2, 2), np.uint8)
-        thresh = cv2.erode(thresh, kernel, iterations=1)
+
         contours, _ = cv2.findContours(
             thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = []
@@ -1413,7 +1410,7 @@ def fillBeforeBeginning(current_line, current_board_line):
                     board_counter += 1
             if line_counter != board_counter and line_counter > 1:
                 return current_board_line
-            
+
             if working_line[0] == working_line[1]:
                 # Clear everything and do backwards
                 working_line.reverse()
@@ -1444,7 +1441,7 @@ def fillBeforeBeginning(current_line, current_board_line):
             working_board.reverse()
             theoretical_board.clear()
             crossed_board.clear()
-    troubleshoot(current_line, current_board_line, working_board)
+
     return working_board
 
 
