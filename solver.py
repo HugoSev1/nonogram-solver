@@ -65,6 +65,7 @@ def setPygame():
         grid_shift+(tile_width*row_width), grid_shift+(tile_width*columns_height), board_width, board_width))
 
 
+# Initializing the game (get values, etc.)
 try:
     # Getting the coordinates of the blue box around the puzzle
     puzzle_coords = nonoSolvFunc.getPuzzleCoords()
@@ -74,13 +75,59 @@ try:
     row_amount = nonoSolvFunc.findRowAmount(column_coords)
 
     # How many rows there are
-    for i in os.scandir("save_files"):
-        print(i)
-    column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
+    save_folder = os.listdir("save_files")
 
-    # Read the digits from the columns
+    # Check the save folder if we want to use it
+    if use_save_file:
+        if "column-digits.txt" not in save_folder:
+            column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
+            with open('save_files/column-digits.txt', 'w+') as f:
+                for line in column_digits:
+                    for number in line:
+                        f.write(f"{number} ")
+                    f.write('\n')
+        else:
+            column_digits = []
+            coldigit_file = open('save_files/column-digits.txt', 'r')
+            for line in coldigit_file.readlines():
+                column_digits.append((line.split(' ')))
+            for i in column_digits:
+                for id_j, j in enumerate(i):
+                    try:
+                        i[id_j] = int(j)
+                    except:
+                        i.remove(i[id_j])
+
+    else:
+        column_digits = nonoSolvFunc.extractColumnNumbers(row_amount)
+
+    # Read the digits from the rows
     row_coords = nonoSolvFunc.getRowImage(puzzle_coords)
-    row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
+
+    # Check the save folder if we want to use it
+    if use_save_file:
+        if "row-digits.txt" not in save_folder:
+            row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
+            with open('save_files/row-digits.txt', 'w+') as f:
+                for line in row_digits:
+                    for number in line:
+                        f.write(f"{number} ")
+                    f.write('\n')
+        else:
+            row_digits = []
+            rowdigit_file = open('save_files/row-digits.txt', 'r')
+            for line in rowdigit_file.readlines():
+                row_digits.append((line.split(' ')))
+            for i in row_digits:
+                for id_j, j in enumerate(i):
+                    try:
+                        i[id_j] = int(j)
+                    except:
+                        i.remove(i[id_j])
+            print(row_digits)
+
+    else:
+        row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
 
     # Make a two-dimensional array to store the game board
     game_board = []
@@ -125,6 +172,7 @@ try:
         screen.fill((42, 43, 35))
         setPygame()
 except:
+    raise
     print("An error occured while initializing.")
 
 
@@ -777,42 +825,69 @@ def placeIngame():
     nonoSolvFunc.placeTiles(row_amount, board_coords, game_board)
 
 
-# Let the user change the board numbers if they are incorrect
-if is_pygame_used and double_check_line:
-    gameRunning = True
-    while gameRunning:
-        for event in pygame.event.get():
-            # Things that are in common for both Pygame windows
-            commonPygame(event, pygame_width)
-            board_width = pygame_width[0]
-            tile_width = board_width/row_amount
+try:
+    # Let the user change the board numbers if they are incorrect
+    if is_pygame_used and double_check_line:
+        gameRunning = True
+        while gameRunning:
+            for event in pygame.event.get():
+                # Things that are in common for both Pygame windows
+                commonPygame(event, pygame_width)
+                board_width = pygame_width[0]
+                tile_width = board_width/row_amount
 
-            # Detect left click
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                # Tile that has been clicked
-                clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
-                                int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
+                # Detect left click
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    # Tile that has been clicked
+                    clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
+                                    int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
 
-                # Only proceed if we clicked a line (and not the board)
-                # Do rows
-                if clicked_tile[0] >= -row_width and clicked_tile[0] < 0 and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
-                    board = []
-                    value = ''
-                    print(
-                        f"What will be the new value of {row_digits[clicked_tile[1]]}, the #{clicked_tile[1] + 1} row?")
-                    while value != end_char:
-                        value = input(f'Enter an integer:')
-                        if value != end_char:
-                            board.append(int(value))
-                    row_digits[clicked_tile[1]] = board
-                # Do columns
-                if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= -columns_height and clicked_tile[1] < 0:
-                    print(column_digits[clicked_tile[0]])
+                    # Only proceed if we clicked a line (and not the board)
+                    # Do rows
+                    if clicked_tile[0] >= -row_width and clicked_tile[0] < 0 and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
+                        board = []
+                        value = ''
+                        print(
+                            f"What will be the new value of {row_digits[clicked_tile[1]]}, the #{clicked_tile[1] + 1} row?")
+                        while value != end_char:
+                            value = input(f'Enter an integer:')
+                            if value != end_char:
+                                board.append(int(value))
+                        row_digits[clicked_tile[1]] = board
+                    # Do columns
+                    if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= -columns_height and clicked_tile[1] < 0:
+                        board = []
+                        value = ''
+                        print(
+                            f"What will be the new value of {column_digits[clicked_tile[0]]}, the #{clicked_tile[0] + 1} row?")
+                        while value != end_char:
+                            value = input(f'Enter an integer:')
+                            if value != end_char:
+                                board.append(int(value))
+                        column_digits[clicked_tile[0]] = board
+                    setPygame()
 
-            if event.type == pygame.QUIT:
-                gameRunning = False
-        pygame.display.update()
-    pygame.quit()
+                if event.type == pygame.QUIT:
+                    # Save the lines
+                    # Do columns
+                    with open('save_files/column-digits.txt', 'w+') as f:
+                        for line in column_digits:
+                            for number in line:
+                                f.write(f"{number} ")
+                            f.write('\n')
+
+                    # Do rows
+                    with open('save_files/row-digits.txt', 'w+') as f:
+                        for line in row_digits:
+                            for number in line:
+                                f.write(f"{number} ")
+                            f.write('\n')
+
+                    gameRunning = False
+            pygame.display.update()
+        pygame.quit()
+except:
+    print("An error occured during the manual line changer.")
 
 # Do the first repeat by default
 # First functions
@@ -829,79 +904,83 @@ except:
 
 
 # Display in Pygame
-if is_pygame_used:
-    # ------------------------
-    # Draw the tiles in Pygame
-    # ------------------------
+try:
+    if is_pygame_used:
+        # ------------------------
+        # Draw the tiles in Pygame
+        # ------------------------
 
-    # The higher the number is, the larger the tile length will be displayed
-    tile_length = 7.5
+        # The higher the number is, the larger the tile length will be displayed
+        tile_length = 7.5
 
-    gameRunning = True
-    # Setup for text displaying
-    pygame.font.init()
-    font = pygame.font.SysFont("Arial", int(tile_width))
+        gameRunning = True
+        # Setup for text displaying
+        pygame.font.init()
+        font = pygame.font.SysFont("Arial", int(tile_width))
 
-    # Display the board in a pygame window
-    pygame.init
-    screen = pygame.display.set_mode((1000, 1000))
-    screen.fill((42, 43, 35))
-    setPygame()
+        # Display the board in a pygame window
+        pygame.init
+        screen = pygame.display.set_mode((1000, 1000))
+        screen.fill((42, 43, 35))
+        setPygame()
 
-    while gameRunning:
-        updatePygame()
-        board_width = pygame_width[0]
-        tile_width = board_width/row_amount
+        while gameRunning:
+            updatePygame()
+            board_width = pygame_width[0]
+            tile_width = board_width/row_amount
 
-        for event in pygame.event.get():
-            # Things that are in common for both Pygame windows
-            commonPygame(event, pygame_width)
+            for event in pygame.event.get():
+                # Things that are in common for both Pygame windows
+                commonPygame(event, pygame_width)
 
-            # Detect left click
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                # Tile that has been clicked
-                clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
-                                int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
+                # Detect left click
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # Tile that has been clicked
+                    clicked_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
+                                    int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
 
-                # Only update the board when the clicked position is in the board
-                if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
-                    # State of this tile (0 by default, T for a black square, or F for a red square that corresponds to a cross in-game in the browser)
-                    tile_state = game_board[clicked_tile[1]][clicked_tile[0]]
+                    # Only update the board when the clicked position is in the board
+                    if clicked_tile[0] >= 0 and clicked_tile[0] < row_amount and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
+                        # State of this tile (0 by default, T for a black square, or F for a red square that corresponds to a cross in-game in the browser)
+                        tile_state = game_board[clicked_tile[1]
+                                                ][clicked_tile[0]]
 
-                    # Left click on a black tile
-                    if tile_state == 'T' and event.button == 1:
-                        game_board[clicked_tile[1]][clicked_tile[0]] = 0
-                    # Left click on a non-black tile
-                    if tile_state != 'T' and event.button == 1:
-                        game_board[clicked_tile[1]][clicked_tile[0]] = 'T'
-                    # Right click on a red tile
-                    if tile_state == 'F' and event.button == 3:
-                        game_board[clicked_tile[1]][clicked_tile[0]] = 0
-                    # Left click on a non-red tile
-                    if tile_state != 'F' and event.button == 3:
-                        game_board[clicked_tile[1]][clicked_tile[0]] = 'F'
+                        # Left click on a black tile
+                        if tile_state == 'T' and event.button == 1:
+                            game_board[clicked_tile[1]][clicked_tile[0]] = 0
+                        # Left click on a non-black tile
+                        if tile_state != 'T' and event.button == 1:
+                            game_board[clicked_tile[1]][clicked_tile[0]] = 'T'
+                        # Right click on a red tile
+                        if tile_state == 'F' and event.button == 3:
+                            game_board[clicked_tile[1]][clicked_tile[0]] = 0
+                        # Left click on a non-red tile
+                        if tile_state != 'F' and event.button == 3:
+                            game_board[clicked_tile[1]][clicked_tile[0]] = 'F'
 
-            # Do all the functions when R is pressed
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
-                try:
-                    repeatSolve()
-                # If an error occured, restart the game
-                except:
-                    print("An error occured. The game will restart.")
-                    for id_i, i in enumerate(game_board):
-                        for id_j, j in enumerate(i):
-                            game_board[id_i][id_j] = 0
-                    beginSolve()
-                    repeatSolve()
+                # Do all the functions when R is pressed
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    try:
+                        repeatSolve()
+                    # If an error occured, restart the game
+                    except:
+                        print("An error occured. The game will restart.")
+                        for id_i, i in enumerate(game_board):
+                            for id_j, j in enumerate(i):
+                                game_board[id_i][id_j] = 0
+                        beginSolve()
+                        repeatSolve()
 
-            # Place in-game in the browser when P is pressed
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
-                placeIngame()
+                # Place in-game in the browser when P is pressed
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                    placeIngame()
 
-            if event.type == pygame.QUIT:
-                gameRunning = False
-        pygame.display.update()
-    pygame.quit()
+                if event.type == pygame.QUIT:
+                    gameRunning = False
+            pygame.display.update()
+        pygame.quit()
+except:
+    print("An error occured while trying to display the board in Pygame.")
 
 
 # ---------------------------
