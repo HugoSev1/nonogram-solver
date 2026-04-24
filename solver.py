@@ -1,6 +1,7 @@
 import nonoSolvFunc
 import pygame
 import os
+import copy
 
 # Only proceed with Pygame if this is set to True (just change the value here if you want to toggle)
 is_pygame_used = True
@@ -15,7 +16,7 @@ use_save_file = True
 end_char = '/'
 
 # Width of the board in Python (mutable)
-pygame_width = [450]
+pygame_width = [700]
 
 
 # Place the lines in Pygame
@@ -124,17 +125,46 @@ try:
                         i[id_j] = int(j)
                     except:
                         i.remove(i[id_j])
-            print(row_digits)
 
     else:
         row_digits = nonoSolvFunc.extractRowNumbers(row_amount)
 
     # Make a two-dimensional array to store the game board
-    game_board = []
-    for id_i, i in enumerate(column_digits):
-        game_board.append([])
-        for j in row_digits:
-            game_board[id_i].append(0)
+    if use_save_file and 'board' in os.listdir('save_files'):
+        # Version from the txt file
+        unfiltered_game_board = []
+
+        # Clean version
+        game_board = []
+
+        backup_index = len(os.listdir('save_files/board'))
+
+        # If there's no backup, create an empty board
+        if backup_index == 0:
+            for i in range(row_amount):
+                game_board.append([])
+                for j in range(row_amount):
+                    game_board[i].append(0)
+        else:
+            board_file = open(f'save_files/board/{backup_index - 1}.txt')
+            for line in board_file.readlines():
+                unfiltered_game_board.append((line.split(' ')))
+
+            # Cleaning
+            for id_i, i in enumerate(unfiltered_game_board):
+                game_board.append([])
+                for j in i:
+                    if j == 'T' or j == 'F':
+                        game_board[id_i].append(str(j))
+                    elif j == '0':
+                        game_board[id_i].append(int(j))
+
+    else:
+        game_board = []
+        for id_i, i in enumerate(column_digits):
+            game_board.append([])
+            for j in row_digits:
+                game_board[id_i].append(0)
 
     # Copy the board (Will be useful later)
     previous_board = []
@@ -172,7 +202,6 @@ try:
         screen.fill((42, 43, 35))
         setPygame()
 except:
-    raise
     print("An error occured while initializing.")
 
 
@@ -190,7 +219,7 @@ def beginSolve():
     for i in range(row_amount):
         line_index = i
         # Do columns
-        for id_j, j in enumerate(column_digits[i]):
+        for id_j, _ in enumerate(column_digits[i]):
             number_index = id_j
             current_working_area = (nonoSolvFunc.limitLineArea(
                 column_digits[line_index], number_index, row_amount))
@@ -202,7 +231,7 @@ def beginSolve():
             nonoSolvFunc.fillColumn(extremum_array, game_board, line_index)
 
         # Do rows
-        for id_j, j in enumerate(row_digits[i]):
+        for id_j, _ in enumerate(row_digits[i]):
             number_index = id_j
             current_working_area = (nonoSolvFunc.limitLineArea(
                 row_digits[line_index], number_index, row_amount))
@@ -868,40 +897,55 @@ try:
                     setPygame()
 
                 if event.type == pygame.QUIT:
-                    # Save the lines
-                    # Do columns
-                    with open('save_files/column-digits.txt', 'w+') as f:
-                        for line in column_digits:
-                            for number in line:
-                                f.write(f"{number} ")
-                            f.write('\n')
+                    # Save the lines if using a save file is set to True
+                    if use_save_file:
+                        # Do columns
+                        with open('save_files/column-digits.txt', 'w+') as f:
+                            for line in column_digits:
+                                for number in line:
+                                    f.write(f"{number} ")
+                                f.write('\n')
 
-                    # Do rows
-                    with open('save_files/row-digits.txt', 'w+') as f:
-                        for line in row_digits:
-                            for number in line:
-                                f.write(f"{number} ")
-                            f.write('\n')
+                        # Do rows
+                        with open('save_files/row-digits.txt', 'w+') as f:
+                            for line in row_digits:
+                                for number in line:
+                                    f.write(f"{number} ")
+                                f.write('\n')
 
-                    gameRunning = False
+                    try:
+                        # Do the beginning of the solve
+                        beginSolve()
+                        repeatSolve()
+
+                        # Save the first intsance of the board if the save option is used
+                        if use_save_file:
+                            if "board" not in save_folder:
+                                os.makedirs('save_files/board')
+                                with open('save_files/board/0.txt', 'w+') as f:
+                                    for line in game_board:
+                                        for tile in line:
+                                            f.write(f"{tile} ")
+                                        f.write('\n')
+                            elif len(os.listdir('save_files/board')) == 0:
+                                with open('save_files/board/0.txt', 'w+') as f:
+                                    for line in game_board:
+                                        for tile in line:
+                                            f.write(f"{tile} ")
+                                        f.write('\n')
+
+                        gameRunning = False
+                    except:
+                        print(
+                            "An error occured while trying to begin the solve. Please make sure that the numbers for the lines are correct.")
+                        for i in game_board:
+                            for id_j, _ in enumerate(i):
+                                i[id_j] = 0
+
             pygame.display.update()
         pygame.quit()
 except:
     print("An error occured during the manual line changer.")
-
-# Do the first repeat by default
-# First functions
-try:
-    beginSolve()
-except:
-    print("An error occured while trying to run the first functions of the solve.")
-
-# Repeating functions
-try:
-    repeatSolve()
-except:
-    print("An error occured while trying to run the repeating functions of the solve.")
-
 
 # Display in Pygame
 try:
@@ -961,19 +1005,138 @@ try:
                 # Do all the functions when R is pressed
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                     try:
+                        board_before = copy.deepcopy(game_board)
                         repeatSolve()
-                    # If an error occured, restart the game
+                        # Make a backup if the game changed
+                        if board_before != game_board:
+                            backup_index = len(os.listdir('save_files/board'))
+                            with open(f'save_files/board/{backup_index}.txt', 'w+') as f:
+                                for line in game_board:
+                                    for tile in line:
+                                        f.write(f"{tile} ")
+                                    f.write('\n')
+                    # If an error occured, use a backup if using save files, restart otherwise
                     except:
-                        print("An error occured. The game will restart.")
-                        for id_i, i in enumerate(game_board):
-                            for id_j, j in enumerate(i):
-                                game_board[id_i][id_j] = 0
-                        beginSolve()
-                        repeatSolve()
+                        if use_save_file and 'board' in os.listdir('save_files'):
+                            print(
+                                "An error occured. The game will use the latest backup. If the error persists, remove backup files as they may contain mistakes in the game's progress.")
+
+                            # Use the latest backup
+                            backup_index = len(os.listdir('save_files/board'))
+                            # Version from the txt file
+                            unfiltered_game_board = []
+
+                            # Clean version
+                            game_board = []
+
+                            # If there's no file in the backup folder, restart the game
+                            if backup_index == 0:
+                                if backup_index == 0:
+                                    for i in range(row_amount):
+                                        game_board.append([])
+                                        for j in range(row_amount):
+                                            game_board[i].append(0)
+                                beginSolve()
+                                repeatSolve()
+                                with open('save_files/board/0.txt', 'w+') as f:
+                                    for line in game_board:
+                                        for tile in line:
+                                            f.write(f"{tile} ")
+                                        f.write('\n')
+
+                            else:
+                                board_file = open(
+                                    f'save_files/board/{backup_index - 1}.txt')
+                                for line in board_file.readlines():
+                                    unfiltered_game_board.append(
+                                        (line.split(' ')))
+
+                                # Cleaning
+                                for id_i, i in enumerate(unfiltered_game_board):
+                                    game_board.append([])
+                                    for j in i:
+                                        if j == 'T' or j == 'F':
+                                            game_board[id_i].append(str(j))
+                                        elif j == '0':
+                                            game_board[id_i].append(int(j))
+
+                        else:
+                            print("An error occured. The game will restart.")
+                            for id_i, i in enumerate(game_board):
+                                for id_j, j in enumerate(i):
+                                    game_board[id_i][id_j] = 0
+                            beginSolve()
+                            repeatSolve()
+
+                # Make a savestate
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                    try:
+                        savestate = copy.deepcopy(game_board)
+                        print("A savestate has successfully been made.")
+                    except:
+                        print("Failed to make a savestate.")
+
+                # Load the last savestate
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_l:
+                    try:
+                        game_board = copy.deepcopy(savestate)
+                        print("The last savestate has successfully been loaded.")
+                    except:
+                        print(
+                            "Failed to load the savestate. Please make sure that you made a savestate by pressing S.")
+
+                # Use another backup with the left and right arrows
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                        try:
+                            if event.key == pygame.K_LEFT and backup_index > 0:
+                                backup_index -= 1
+                            elif event.key == pygame.K_RIGHT and backup_index < len(os.listdir('save_files/board')):
+                                backup_index += 1
+                                
+                            # Version from the txt file
+                            unfiltered_game_board = []
+
+                            # Clean version
+                            game_board = []
+
+                            # If there's no file in the backup folder, restart the game
+                            if backup_index == 0:
+                                if backup_index == 0:
+                                    for i in range(row_amount):
+                                        game_board.append([])
+                                        for j in range(row_amount):
+                                            game_board[i].append(0)
+                                beginSolve()
+                                repeatSolve()
+                                with open('save_files/board/0.txt', 'w+') as f:
+                                    for line in game_board:
+                                        for tile in line:
+                                            f.write(f"{tile} ")
+                                        f.write('\n')
+
+                            else:
+                                board_file = open(
+                                    f'save_files/board/{backup_index - 1}.txt')
+                                for line in board_file.readlines():
+                                    unfiltered_game_board.append(
+                                        (line.split(' ')))
+
+                                # Cleaning
+                                for id_i, i in enumerate(unfiltered_game_board):
+                                    game_board.append([])
+                                    for j in i:
+                                        if j == 'T' or j == 'F':
+                                            game_board[id_i].append(str(j))
+                                        elif j == '0':
+                                            game_board[id_i].append(int(j))
+                        except:
+                            pass
 
                 # Place in-game in the browser when P is pressed
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
                     placeIngame()
+                    gameRunning = False
 
                 if event.type == pygame.QUIT:
                     gameRunning = False
