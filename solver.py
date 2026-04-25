@@ -880,7 +880,7 @@ try:
                             f"What will be the new value of {row_digits[clicked_tile[1]]}, the #{clicked_tile[1] + 1} row?")
                         while value != end_char:
                             value = input(f'Enter an integer:')
-                            if value != end_char:
+                            if value != end_char and value != '':
                                 board.append(int(value))
                         row_digits[clicked_tile[1]] = board
                     # Do columns
@@ -891,7 +891,7 @@ try:
                             f"What will be the new value of {column_digits[clicked_tile[0]]}, the #{clicked_tile[0] + 1} row?")
                         while value != end_char:
                             value = input(f'Enter an integer:')
-                            if value != end_char:
+                            if value != end_char and value != '':
                                 board.append(int(value))
                         column_digits[clicked_tile[0]] = board
                     setPygame()
