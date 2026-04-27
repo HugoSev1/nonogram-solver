@@ -103,7 +103,7 @@ def getRowImage(area_array):
     return row_coords
 
 
-# Function that returns the amount of rows / columns
+# Function that returns the amount of tiles per row
 def findRowAmount(coords):
     # Value that will be returned
     row_amount = 0
@@ -125,6 +125,29 @@ def findRowAmount(coords):
             is_counting = True
 
     return row_amount
+
+# Function that returns the amount of tiles per column
+def findColAmount(coords):
+    # Value that will be returned
+    col_amount = 0
+    scrsh = pyautogui.screenshot()
+    column_color = (248, 236, 194)
+
+    x_start = coords[0]
+    y_start = coords[1]
+
+    # Alternates between True and False depending on the color
+    is_counting = True
+    pyautogui.moveTo(x_start, y_start)
+    for y in range(y_start, 1080):
+        if scrsh.getpixel((x_start, y)) == column_color and is_counting:
+            col_amount += 1
+            is_counting = False
+
+        elif scrsh.getpixel((x_start, y)) != column_color:
+            is_counting = True
+
+    return col_amount
 
 
 # Best score (for recognition accuracy)
@@ -220,12 +243,12 @@ def extractColumnNumbers(row_amount):
 
 
 # Function that extracts the numbers shown on the Nonogram (but for the rows this time)
-def extractRowNumbers(row_amount):
+def extractRowNumbers(col_amount):
     extractingArray = []
     # Divides the image in 5 chunks
     img = cv2.imread("row-img.png")
     h, w, c, = img.shape
-    n_chunks = row_amount
+    n_chunks = col_amount
 
     chunks = []
 
@@ -466,9 +489,8 @@ def extractColFromBoard(board, index):
 def extractRowFromBoard(board, index):
     return board[index]
 
+
 # Function that puts an array into a column in the game board
-
-
 def fillColumn(array, board, columnIndex):
     for i in range(len(board)):
         if array != None and len(array) != 0:
@@ -478,7 +500,7 @@ def fillColumn(array, board, columnIndex):
 
 # Function that puts an array into a row in the game board
 def fillRow(array, board, rowIndex):
-    for i in range(len(board)):
+    for i in range(len(board[0])):
         if array != None and len(array) != 0:
             if array[i] == 'T' or array[i] == 'F':
                 board[rowIndex][i] = array[i]
