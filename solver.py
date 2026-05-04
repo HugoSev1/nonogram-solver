@@ -16,7 +16,13 @@ use_save_file = True
 end_char = '/'
 
 # Width of the board in Python (mutable)
-pygame_width = [650]
+pygame_width = [790]
+
+# Color  of the lines when highlighting a tile in Pygame
+highlight_color = (198, 186, 255)
+
+# Highligted tile
+highlighted_tile = []
 
 
 # Place the lines in Pygame
@@ -34,6 +40,15 @@ def setPygame():
             grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
                                                         grid_shift, tile_width, tile_width*columns_height), 3)
+
+        # Highlight if prompted
+        if len(highlighted_tile) == 2:
+            if highlighted_tile[0] == i:
+                pygame.draw.rect(screen, highlight_color, pygame.Rect(
+                    grid_shift+(row_width*tile_width)+i*tile_width, grid_shift, tile_width, tile_width*columns_height))
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift+(row_width*tile_width)+i*tile_width,
+                                                            grid_shift, tile_width, tile_width*columns_height), 3)
+
         for j in range(len(column_digits[i])):
             # Set the difference for alignment purposes
             empty_tiles = (
@@ -51,6 +66,15 @@ def setPygame():
             grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
             columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
+
+        # Highlight if prompted
+        if len(highlighted_tile) == 2:
+            if highlighted_tile[1] == i:
+                pygame.draw.rect(screen, highlight_color, pygame.Rect(
+                    grid_shift, grid_shift+(columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width))
+                pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(grid_shift, grid_shift+(
+                    columns_height*tile_width)+i*tile_width, tile_width*row_width, tile_width), 3)
+
         for j in range(len(row_digits[i])):
             # Set the difference for alignment purposes
             empty_tiles = (row_width-len(row_digits[i])) * tile_width
@@ -846,15 +870,21 @@ def repeatSolve():
         for i in range(row_amount):
             current_line = nonoSolvFunc.extractColFromBoard(game_board, i)
             current_complete_array = nonoSolvFunc.removeLargest(
-                column_digits[i], current_line)
+                column_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.removeLargest(
+                column_digits[i], current_complete_array[::-1])
             nonoSolvFunc.fillColumn(current_complete_array, game_board, i)
 
         # Do rows
         for i in range(col_amount):
             current_line = nonoSolvFunc.extractRowFromBoard(game_board, i)
             current_complete_array = nonoSolvFunc.removeLargest(
-                row_digits[i], current_line)
+                row_digits[i][::-1], current_line[::-1])
+            current_complete_array = nonoSolvFunc.removeLargest(
+                row_digits[i], current_complete_array[::-1])
             nonoSolvFunc.fillRow(current_complete_array, game_board, i)
+        
+        # NOTE: problem with removeLargest, see board file 205.txt in the save files
 
 
 # Update Pygame visually
@@ -913,7 +943,7 @@ try:
 
                     # Only proceed if we clicked a line (and not the board)
                 # Do rows
-                    if clicked_tile[0] >= -row_width and clicked_tile[0] < 0 and clicked_tile[1] >= 0 and clicked_tile[1] < row_amount:
+                    if clicked_tile[0] >= -row_width and clicked_tile[0] < 0 and clicked_tile[1] >= 0 and clicked_tile[1] < col_amount:
                         board = []
                         value = ''
                         print(
@@ -986,6 +1016,7 @@ try:
         pygame.quit()
 except:
     print("An error occured during the manual line changer.")
+    gameRunning = False
 
 # Display in Pygame
 try:
@@ -1055,6 +1086,7 @@ try:
                                     for tile in line:
                                         f.write(f"{tile} ")
                                     f.write('\n')
+                        backup_index = len(os.listdir('save_files/board'))
                     # If an error occured, use a backup if using save files, restart otherwise
                     except:
                         if use_save_file and 'board' in os.listdir('save_files'):
@@ -1107,6 +1139,50 @@ try:
                                     game_board[id_i][id_j] = 0
                             beginSolve()
                             repeatSolve()
+
+                # Check every tile that can't work and switch if we can
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
+                    # Becomes True when a tile is being switched
+                    is_tile_found = False
+
+                    current_board = copy.deepcopy(game_board)
+                    for id_i, i in enumerate(game_board):
+                        if is_tile_found:
+                            break
+                        for id_j, j in enumerate(game_board[id_i]):
+                            if j == 0:
+                                game_board[id_i][id_j] = 'T'
+                                try:
+                                    repeatSolve()
+                                    game_board = copy.deepcopy(current_board)
+                                except:
+                                    game_board = copy.deepcopy(current_board)
+                                    game_board[id_i][id_j] = 'F'
+                                    current_board = copy.deepcopy(game_board)
+                                    print(id_i)
+                                    print(id_j)
+                                    print("-------------")
+                                    is_tile_found = False
+
+                                game_board[id_i][id_j] = 'F'
+                                try:
+                                    repeatSolve()
+                                    game_board = copy.deepcopy(current_board)
+                                except:
+                                    game_board = copy.deepcopy(current_board)
+                                    game_board[id_i][id_j] = 'T'
+                                    current_board = copy.deepcopy(game_board)
+                                    print(id_i)
+                                    print(id_j)
+                                    print("-------------")
+                                    is_tile_found = False
+
+                # Check every tile that can't work and switch if we can
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_h:
+                    # Hovered tile
+                    highlighted_tile = [int((pygame.mouse.get_pos()[0] - (grid_shift + (tile_width * row_width))) // (board_width / row_amount)),
+                                        int((pygame.mouse.get_pos()[1] - (grid_shift + (tile_width * columns_height))) // (board_width / row_amount))]
+                    setPygame()
 
                 # Make a savestate
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_s:

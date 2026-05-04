@@ -126,6 +126,7 @@ def findRowAmount(coords):
 
     return row_amount
 
+
 # Function that returns the amount of tiles per column
 def findColAmount(coords):
     # Value that will be returned
@@ -218,7 +219,7 @@ def extractColumnNumbers(row_amount):
                 curr_y = digits[i][2]
 
                 # Can be adjusted
-                spacing_threshold = h // 20
+                spacing_threshold = h // 30
 
                 if curr_y - prev_bottom < spacing_threshold:
                     current_group.append(digits[i])
@@ -306,7 +307,7 @@ def extractRowNumbers(col_amount):
                 curr_x = digits[i][1]
 
                 # Can be adjusted
-                spacing_threshold = w // 20
+                spacing_threshold = w // 30
 
                 if curr_x - prev_right < spacing_threshold:
                     current_group.append(digits[i])
@@ -330,13 +331,13 @@ def getBoardCoords(x1, y1):
     scrsh = pyautogui.screenshot()
 
     # Append the X at the right of the board
-    for x in range(x1, x1 + 1000):
+    for x in range(x1, x1 + 10000):
         if scrsh.getpixel((x, y1)) == color:
             board_coords.append(x)
             break
 
     # Append the Y at the bottom of the board
-    for y in range(y1, y1 + 1000):
+    for y in range(y1, y1 + 10000):
         if scrsh.getpixel((x1, y)) == color:
             board_coords.append(y)
             break
@@ -347,7 +348,7 @@ def getBoardCoords(x1, y1):
 # Function that places tiles in the browser
 def placeTiles(row_amount, board_coords, game_board):
     length = board_coords[2] - board_coords[0]
-    tile_length = int(length / row_amount)
+    tile_length = length / row_amount
 
     for id_i, i in enumerate(game_board):
         for id_j, j in enumerate(i):
@@ -1495,7 +1496,7 @@ def relFullLine(current_line, current_board_line):
 
     # Only proceed when possible
     if len(sliced_board) == sum(current_line) + len(current_line) - 1 and 'T' not in current_board_line:
-        for i in range(len(current_line)-1):
+        for i in range(len(current_line)):
             if i % 2 == 0:
                 working_line.insert(i+1, 0)
     else:
@@ -1506,7 +1507,7 @@ def relFullLine(current_line, current_board_line):
         if i == 0:
             changed_slice.append('F')
         else:
-            for j in range(i):
+            for _ in range(i):
                 changed_slice.append('T')
 
     # Put the changed board back in the working board
@@ -1692,52 +1693,8 @@ def fillImpossibleSpaces(current_line, current_board_line):
     # Just filling the easy empty spaces
     for i in spaces:
         if len(i) < min(current_line):
-            for id_j, j in enumerate(i):
+            for id_j, _ in enumerate(i):
                 i[id_j] = 'F'
-
-    # Do the trickier ones
-    # Index of the first number in current_line that can fit in the smallest space
-    first_fit = 0
-    for id_i, i in enumerate(current_line):
-        if i <= len(min(spaces, key=len)):
-            first_fit = id_i
-            break
-
-    # Line that we'll work with
-    working_line = current_line[:first_fit]
-
-    # Sliced working board
-    sliced_board = []
-
-    # Board until the first smallest space
-    for i in spaces:
-        if i == min(spaces, key=len):
-            break
-        else:
-            sliced_board.extend(i)
-            sliced_board.extend('F')
-
-    # Remove the F at the end
-    if len(sliced_board) > 0:
-        sliced_board = sliced_board[:-1]
-
-    # Count how many numbers can fit
-    fit_counter = 0
-
-    # Fill the first empty space if the beginning can't fit
-    for i in working_line:
-        for id_j, j in enumerate(sliced_board):
-            if 'F' not in sliced_board[id_j:id_j + i]:
-                fit_counter += 1
-                for id_k, k in enumerate(sliced_board[:id_j + 1]):
-                    sliced_board[id_k] = 'F'
-
-    if fit_counter < len(working_line):
-        for i in spaces:
-            # Put F's in the space if it has to be F's
-            if i == min(spaces, key=len):
-                for id_j, j in enumerate(i):
-                    i[id_j] = 'F'
 
     # Board that will get returned
     final_board = putSpacesBack(spaces, current_board_line)
