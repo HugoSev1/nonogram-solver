@@ -1739,7 +1739,7 @@ def crossAfterComplete(current_line, current_board_line):
     return final_board
 
 
-# Function that detects when each number goes in each space and completes what it can (e.g. with [4, 3] 00000000TF00TT0 will return 00000TTTTF0TTT0)
+# Function that detects when each number goes in each space and completes what it can (e.g. with [4, 3] 00000000TF00TT0 will return 00000TTTTF00TT0)
 def matchSpaces(current_line, current_board_line):
     spaces = getSpaces(current_board_line)
     # Return the original board if the line is completed or if there aren't as many spaces as numbers on the line
