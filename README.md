@@ -13,6 +13,7 @@ To debug and use the program, I use VSCode. There's a few variables and controls
    * **use_save_file** : If True, then a save folder will be used for the board and the lines (useful for larger games in case of mistakes or if there's an issue with the program)
    * **end_char** : Character to use after entering the numbers when typing the lines to change while double-checking
    * **pygame_width** : Level of zoom of the grid by default with Pygame (can be changed with the **+** and **-** keys)
+   * **is_tile_found** : If True and followed by a **break** statement at both points where it's applied (for T and F), then this loop stops
 2. In nonoSolvFunc.py which contains most of the functions that solve the game, there's spacing_threshold that we can change: this variable helps to make the difference between numbers such as a 1 followed by a 2 (1 2 / one then two) compared to a 12 (twelve)
 3. Controls in Pygame:
    * **R**: Runs repeatSolve() which runs every relative function (i.e. except the beginning which doesnt' take the tiles that are already on the board into account, as there's none when the game starts)
@@ -45,6 +46,7 @@ Pour debug et utiliser le programme, j'utilise VSCode. Il y a quelques variables
    * **use_save_file** : Si True, alors un dossier de sauvegarde sera utilisé pour la grille et les lignes (utile pour les plus grandes games en cas d'erreur ou de problème avec le programme)
    * **end_char** : Caractère à utiliser après avoir entré les nombres lors de la saisie des lignes à modifier dans le double-check
    * **pygame_width** : niveau de zoom de la grille par défaut sur Pygame (modifiable avec les touches **+** et **-**)
+   * **is_tile_found** : Si True puis suivie d'un **break** aux deux applications (pour T et F), alors cette boucle s'arrête
 2. Dans nonoSolvFunc.py qui contient la plupart des fonctions qui résoudent la game, il y a spacing_threshold qui est modifiable : cette variable permet de différencier des nombres tels qu'un 1 suivi d'un 2 (1 2 / un puis deux) comparé à un 12 (douze)
 3. Les contrôles dans Pygame :
    * **R** : Lance repeatSolve() qui exécute toutes les fonctions dites relatives (i.e. à part le tout début qui est indépendant des cases déjà cochées puisqu'aucune ne l'est lorsque la partie commence)
