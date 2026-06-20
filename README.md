@@ -27,7 +27,7 @@ To debug and use the program, I use VSCode. There's a few variables and controls
    * In the variable game_board, a **T** (for True) corresponds to a black tile, an **F** (for False) corresponds to a cross, which is represented by a red square in Pygame, and finally a **0** corresponds to a tile that hasn't been filled yet. In some functions, this 0 may be temporarily changed to another number, then switched back to either a T, an F or a 0 in this same function.
    * When you launch the program, make sure that the blue square around the board is entirely present, as it is used to detect where the board is located.
 
-📽️Video link ➡️ *TBA*
+📽️Video link ➡️ https://youtu.be/0wWwbnne4ho
 
 🎮Game link ➡️ https://www.puzzle-nonograms.com
 
@@ -60,6 +60,6 @@ Pour debug et utiliser le programme, j'utilise VSCode. Il y a quelques variables
    * Dans la variable game_board, un **T** (pour True, soit Vrai en français) correspond aux cases cochées en noir, un **F** (pour False, soit Faux en français) correspond à une croix, qui est représentée par un carré rouge dans Pygame, et enfin un *0** correspond aux cases qui ne sont pas encore remplies. Dans certaines fonctions, ce 0 est parfois temporairement changé en un autre nombre, puis changé en soit un T, soit un F, soit un 0 dans cette même fonction.
    * Lorsque vous lancez le programme, assurez-vous que le carré bleu autour de la grille est entièrement présent, car il est utilisé pour détecter ou se situe la grille.
 
-📽️Lien de la vidéo ➡️ *à venir*
+📽️Lien de la vidéo ➡️ https://youtu.be/0wWwbnne4ho
 
 🎮Lien du site du jeu ➡️ https://www.puzzle-nonograms.com
